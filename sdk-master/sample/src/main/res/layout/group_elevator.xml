@@ -12,5 +12,10 @@
         style="@style/ButtonCommon"
         android:text="Test 1" />
 
+    <Button
+        android:id="@+id/btnTestVoice"
+        style="@style/ButtonCommon"
+        android:text="Test Majo's Voice Code" />
+
 
 </LinearLayout>
