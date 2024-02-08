@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnCount="4"
+    android:columnCount="5"
     android:rowCount="1"
     tools:background="@color/colorBlack"
     tools:ignore="HardcodedText">
@@ -14,10 +14,10 @@
         android:layout_columnWeight="1"
         android:background="@drawable/group_button_bg"
         android:drawableTop="@drawable/ic_settings"
-        android:textOn="System"
+        android:textColor="@color/colorWhite"
         android:textOff="System"
-        android:textSize="@dimen/toggleBtnTextSize"
-        android:textColor="@color/colorWhite" />
+        android:textOn="System"
+        android:textSize="@dimen/toggleBtnTextSize" />
 
     <androidx.appcompat.widget.AppCompatToggleButton
         android:id="@+id/btnGroupNavigation"
@@ -26,10 +26,10 @@
         android:layout_columnWeight="1"
         android:background="@drawable/group_button_bg"
         android:drawableTop="@drawable/ic_navi"
-        android:textOn="Navigation"
+        android:textColor="@color/colorWhite"
         android:textOff="Navigation"
-        android:textSize="@dimen/toggleBtnTextSize"
-        android:textColor="@color/colorWhite" />
+        android:textOn="Navigation"
+        android:textSize="@dimen/toggleBtnTextSize" />
 
     <androidx.appcompat.widget.AppCompatToggleButton
         android:id="@+id/btnGroupPermission"
@@ -38,10 +38,10 @@
         android:layout_columnWeight="1"
         android:background="@drawable/group_button_bg"
         android:drawableTop="@drawable/ic_permissions"
-        android:textOn="Permission"
+        android:textColor="@color/colorWhite"
         android:textOff="Permission"
-        android:textSize="@dimen/toggleBtnTextSize"
-        android:textColor="@color/colorWhite" />
+        android:textOn="Permission"
+        android:textSize="@dimen/toggleBtnTextSize" />
 
     <androidx.appcompat.widget.AppCompatToggleButton
         android:id="@+id/btnGroupResources"
@@ -50,9 +50,23 @@
         android:layout_columnWeight="1"
         android:background="@drawable/group_button_bg"
         android:drawableTop="@drawable/ic_resource"
-        android:textOn="Resources"
+        android:textColor="@color/colorWhite"
         android:textOff="Resources"
-        android:textSize="@dimen/toggleBtnTextSize"
-        android:textColor="@color/colorWhite" />
+        android:textOn="Resources"
+        android:textSize="@dimen/toggleBtnTextSize" />
+
+    <androidx.appcompat.widget.AppCompatToggleButton
+        android:id="@+id/btnGroupElevator"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_row="0"
+        android:layout_column="4"
+        android:layout_columnWeight="1"
+        android:background="@drawable/group_button_bg"
+        android:drawableTop="@drawable/ic_elevator2"
+        android:textColor="@color/colorWhite"
+        android:textOff="Elevator"
+        android:textOn="Elevator"
+        android:textSize="@dimen/toggleBtnTextSize" />
 
 </GridLayout>
