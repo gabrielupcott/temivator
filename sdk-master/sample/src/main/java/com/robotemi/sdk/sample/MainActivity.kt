@@ -1085,7 +1085,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * Display the saved locations in a dialog
      */
     private fun savedLocationsDialog() {
+        //Puts current UI in the background
         hideKeyboard()
+        //Gets the locations
         val locations = robot.locations.toMutableList()
         val locationAdapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, locations)
         val versionsDialog = AlertDialog.Builder(this@MainActivity)
