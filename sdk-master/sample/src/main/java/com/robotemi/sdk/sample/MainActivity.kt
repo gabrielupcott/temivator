@@ -271,6 +271,14 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         super.onDestroy()
     }
 
+    /**
+     * Method to test on the new button
+     */
+    private fun TestSpeak() {
+        robot.speak(create("I have no arms. Please push the elevator button for me!", false))
+
+    }
+
     private fun initOnClickListener() {
         btnGroupSystem.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -346,7 +354,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         val mediaPlayer = MediaPlayer()
 
         btnGroupSystem.isChecked = true
-
+        btnTestVoice.setOnClickListener{ TestSpeak() }
         btnSpeak.setOnClickListener { speak() }
         btnSaveLocation.setOnClickListener { saveLocation() }
         btnGoTo.setOnClickListener { goTo() }
