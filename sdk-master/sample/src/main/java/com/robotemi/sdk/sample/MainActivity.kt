@@ -663,8 +663,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          */
 
         btnTest1.setOnClickListener{doTest1()}
+        btnListMaps.setOnClickListener{getMapListBtn()}
+        btnLoadMapNoDialog.setOnClickListener{loadMapNoDialog(reposeRequired = false, position = null, offline = false, withoutUI = true, id = "" )}
     }
 
+                                            //    reposeRequired: Boolean,
+                                            //    position: Position?,
+                                            //    offline: Boolean = false,
+                                            //    withoutUI: Boolean = false,
+                                            //    id: String = ""
     /**
      * This is where the onClick functions for the Elevator tab buttons are
      */
@@ -681,6 +688,55 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the actual logic should be written
          */
+    }
+
+    private fun loadMapNoDialog(
+        reposeRequired: Boolean,
+        position: Position?,
+        offline: Boolean = false,
+        withoutUI: Boolean = false,
+        id: String = ""
+    ) {
+        var newId: String = id;
+        if (mapList.isEmpty()) {
+            getMapList()
+        }
+        if (robot.checkSelfPermission(Permission.MAP) != Permission.GRANTED) {
+            return
+        }
+        val mapListString: MutableList<String> = ArrayList()
+        for (i in mapList.indices) {
+            mapListString.add(mapList[i].name)
+            runOnUiThread{
+                printLog(mapList[i].name)
+                printLog(mapList[i].id)
+            }
+        }
+
+        if (id.equals("")) newId = mapList[0].id
+        runOnUiThread{
+            printLog("loading map with id: $id");
+        }
+
+//        val mapListAdapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, mapListString)
+//        val builder = AlertDialog.Builder(this)
+//        builder.setTitle("Click item to load specific map")
+//        builder.setAdapter(mapListAdapter, null)
+//        val dialog = builder.create()
+//        dialog.listView.onItemClickListener =
+//            OnItemClickListener { _, _, pos: Int, _ ->
+//                val requestId =
+//                    robot.loadMap(
+//                        mapList[pos].id,
+//                        reposeRequired,
+//                        position,
+//                        offline = offline,
+//                        withoutUI = withoutUI
+//                    )
+//                printLog("Loading map: ${mapList[pos]}, request id $requestId, reposeRequired $reposeRequired, position $position, offline $offline, withoutUI $withoutUI")
+//                dialog.dismiss()
+//            }
+//        dialog.show()
     }
 
     private fun getCurrentFloor() {
