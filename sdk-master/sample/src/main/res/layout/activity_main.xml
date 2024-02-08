@@ -246,6 +246,11 @@
                     layout="@layout/group_resources"
                     android:visibility="gone" />
 
+                <include
+                    android:id="@+id/group_elevator"
+                    layout="@layout/group_elevator"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </ScrollView>
 

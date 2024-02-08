@@ -81,6 +81,8 @@ import kotlinx.android.synthetic.main.group_app_and_permission.*
 import kotlinx.android.synthetic.main.group_buttons.*
 import kotlinx.android.synthetic.main.group_map_and_movement.*
 import kotlinx.android.synthetic.main.group_resources.*
+import kotlinx.android.synthetic.main.group_elevator.*
+//import kotlinx.android.synthetic.main.group_elevator.*
 import kotlinx.android.synthetic.main.group_settings_and_status.*
 import java.io.File
 import java.io.FileOutputStream
@@ -277,6 +279,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 btnGroupNavigation.isChecked = false
                 btnGroupPermission.isChecked = false
                 btnGroupResources.isChecked = false
+                btnGroupElevator.isChecked = false;
             } else {
                 group_settings_and_status.visibility = View.GONE
                 btnGroupSystem.isEnabled = true
@@ -289,6 +292,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 btnGroupNavigation.isEnabled = false
                 btnGroupPermission.isChecked = false
                 btnGroupResources.isChecked = false
+                btnGroupElevator.isChecked = false;
+
             } else {
                 group_map_and_movement.visibility = View.GONE
                 btnGroupNavigation.isEnabled = true
@@ -301,6 +306,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 btnGroupNavigation.isChecked = false
                 btnGroupPermission.isEnabled = false
                 btnGroupResources.isChecked = false
+                btnGroupElevator.isChecked = false;
+
             } else {
                 group_app_and_permission.visibility = View.GONE
                 btnGroupPermission.isEnabled = true
@@ -313,9 +320,26 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 btnGroupNavigation.isChecked = false
                 btnGroupPermission.isChecked = false
                 btnGroupResources.isEnabled = false
+                btnGroupElevator.isChecked = false;
             } else {
                 group_resources.visibility = View.GONE
                 btnGroupResources.isEnabled = true
+            }
+        }
+        /**
+         * This is code added to be able to switch to and from the Elevator tab
+         */
+        btnGroupElevator.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                group_elevator.visibility = View.VISIBLE
+                btnGroupSystem.isChecked = false
+                btnGroupNavigation.isChecked = false
+                btnGroupPermission.isChecked = false
+                btnGroupResources.isChecked = false
+                btnGroupElevator.isEnabled = false;
+            } else {
+                group_elevator.visibility = View.GONE
+                btnGroupElevator.isEnabled = true;
             }
         }
 
@@ -633,6 +657,30 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 printLog("Cannot launch browser, probably temi browser app not installed.")
             }
         }
+
+        /**
+         * This is where the onClickListeners for the Elevator tab buttons are
+         */
+
+        btnTest1.setOnClickListener{doTest1()}
+    }
+
+    /**
+     * This is where the onClick functions for the Elevator tab buttons are
+     */
+
+    private fun doTest1(){
+
+        /**
+         * This is how you run code on the UI Thread
+         */
+        runOnUiThread {
+            printLog("Hello world!")
+        }
+
+        /**
+         * This is where the actual logic should be written
+         */
     }
 
     private fun getCurrentFloor() {
