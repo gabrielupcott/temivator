@@ -690,6 +690,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          */
     }
 
+    /**
+     * Modified versin of loadMap function with dialog removed.
+     */
     private fun loadMapNoDialog(
         reposeRequired: Boolean,
         position: Position?,
@@ -697,7 +700,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         withoutUI: Boolean = false,
         id: String = ""
     ) {
+        // newId var is for parameter for new map to be loaded
         var newId: String = id;
+        // found var for flag if map to change to is in stored list or not
+        var found: Boolean = false;
         if (mapList.isEmpty()) {
             getMapList()
         }
@@ -707,16 +713,35 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         val mapListString: MutableList<String> = ArrayList()
         for (i in mapList.indices) {
             mapListString.add(mapList[i].name)
+            // if it found map with id, set found flag to true
+            if (mapList[i].id.equals(newId)) found = true;
             runOnUiThread{
                 printLog(mapList[i].name)
                 printLog(mapList[i].id)
             }
         }
 
-        if (id.equals("")) newId = mapList[0].id
-        runOnUiThread{
-            printLog("loading map with id: $id");
+        // if not found, print and dont do anything
+        if (!found){
+            runOnUiThread{
+                printLog("no map with id: $id found!");
+            }
         }
+        // if was found, load map with id
+        else {
+            if (id.equals("")) newId = mapList[0].id
+            runOnUiThread{
+                printLog("loading map with id: $id");
+            }
+        }
+
+//        val map: MapModel = MapModel();
+//        if (mapList.indexOf() == -1){
+//            runOnUiThread{
+//                printLog("no map with id: $id found!");
+//            }
+//            break;
+//        }
 
 //        val mapListAdapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, mapListString)
 //        val builder = AlertDialog.Builder(this)

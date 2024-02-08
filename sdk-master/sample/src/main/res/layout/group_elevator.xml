@@ -20,7 +20,7 @@
     <Button
         android:id="@+id/btnLoadMapNoDialog"
         style="@style/ButtonCommon"
-        android:text="List Maps" />
+        android:text="Load map by id" />
 
 
 </LinearLayout>
