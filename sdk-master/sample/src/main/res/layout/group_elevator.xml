@@ -15,7 +15,8 @@
     <Button
         android:id="@+id/btnTestVoice"
         style="@style/ButtonCommon"
-        android:text="Test Majo's Voice Code" />
+        android:text="Elevator Voice Response" />
+
 
 
 </LinearLayout>

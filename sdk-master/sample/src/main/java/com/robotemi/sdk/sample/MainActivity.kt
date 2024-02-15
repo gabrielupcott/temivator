@@ -274,8 +274,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     /**
      * Method to test on the new button
      */
-    private fun TestSpeak() {
-        robot.speak(create("I have no arms. Please push the elevator button for me!", false))
+    private fun responseAtElevator() {
+        robot.speak(create("Please push the elevator button for me!", false))
+        //Get an answer from the user - listen to response
 
     }
 
@@ -353,8 +354,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         val mediaPlayer = MediaPlayer()
 
+        /**
+         * Event handlers
+         */
         btnGroupSystem.isChecked = true
-        btnTestVoice.setOnClickListener{ TestSpeak() }
+        //Event handler for elavator response
+        btnTestVoice.setOnClickListener{ responseAtElevator() }
         btnSpeak.setOnClickListener { speak() }
         btnSaveLocation.setOnClickListener { saveLocation() }
         btnGoTo.setOnClickListener { goTo() }
@@ -1174,7 +1179,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     /**
      * When adding the Nlp Listener to your project you need to implement this method
      * which will listen for specific intents and allow you to respond accordingly.
-     *
      *
      * See AndroidManifest.xml for reference on adding each intent.
      */
