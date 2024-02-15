@@ -29,5 +29,19 @@
         android:layout_height="wrap_content"
         android:text="Load map by id, with repose" />
 
+    <Button
+        android:id="@+id/btnChangeSpeed"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Change Speed" />
+
+    <Button
+        android:id="@+id/btnChangeSpeedHigh"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Change Speed: High" />
+
 
 </LinearLayout>
