@@ -13,6 +13,11 @@
         android:text="Test 1" />
 
     <Button
+        android:id="@+id/btnTestVoice"
+        style="@style/ButtonCommon"
+        android:text="Elevator Voice Response" />
+
+    <Button
         android:id="@+id/btnListMaps"
         style="@style/ButtonCommon"
         android:text="List Maps" />
@@ -50,6 +55,7 @@
         android:layout_height="wrap_content"
         android:onClick="WillsGoTo"
         android:text="Will's Test Button" />
+
 
 
 </LinearLayout>
