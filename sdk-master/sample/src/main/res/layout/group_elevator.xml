@@ -12,5 +12,22 @@
         style="@style/ButtonCommon"
         android:text="Test 1" />
 
+    <Button
+        android:id="@+id/btnListMaps"
+        style="@style/ButtonCommon"
+        android:text="List Maps" />
+
+    <Button
+        android:id="@+id/btnLoadMapNoDialog"
+        style="@style/ButtonCommon"
+        android:text="Load map by id, no repose" />
+
+    <Button
+        android:id="@+id/btnLoadMapNoDialog2"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Load map by id, with repose" />
+
 
 </LinearLayout>
