@@ -664,7 +664,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         btnTest1.setOnClickListener{doTest1()}
         btnListMaps.setOnClickListener{getMapListBtn()}
-        btnLoadMapNoDialog.setOnClickListener{loadMapNoDialog(reposeRequired = false, position = null, offline = false, withoutUI = true, id = "" )}
+        btnLoadMapNoDialog.setOnClickListener{
+            loadMapNoDialog(reposeRequired = false, position = Position(4.5F, 0.083F, -1.6F, 23), offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
+        }
+        btnLoadMapNoDialog2.setOnClickListener{
+            loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
+        }
     }
 
                                             //    reposeRequired: Boolean,
@@ -691,30 +696,45 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     /**
-     * Modified versin of loadMap function with dialog removed.
+     * Modified version of loadMap function with dialog removed. ID is hardcoded in the onClick handler above.
+     *
+     *
+     * reposeRequired: Boolean: Whether the robot needs to reposition itself upon loading.
+     * position: Position: The position of the robot within the new map
+     * offline: Boolean: Whether to load the map online or offline
+     * withoutUI: Boolean: Whether to show the map loading UI
+     * id: String: The ID of the new map to load
      */
     private fun loadMapNoDialog(
         reposeRequired: Boolean,
         position: Position?,
-        offline: Boolean = false,
-        withoutUI: Boolean = false,
+        offline: Boolean = true,
+        withoutUI: Boolean = true,
         id: String = ""
     ) {
         // newId var is for parameter for new map to be loaded
         var newId: String = id;
+        // pos var to save pos of found map with id
+        var pos: Int = 0;
         // found var for flag if map to change to is in stored list or not
         var found: Boolean = false;
         if (mapList.isEmpty()) {
             getMapList()
         }
         if (robot.checkSelfPermission(Permission.MAP) != Permission.GRANTED) {
+            runOnUiThread{
+                printLog("No permissions")
+            }
             return
         }
         val mapListString: MutableList<String> = ArrayList()
         for (i in mapList.indices) {
             mapListString.add(mapList[i].name)
             // if it found map with id, set found flag to true
-            if (mapList[i].id.equals(newId)) found = true;
+            if (mapList[i].id.equals(newId)) {
+                found = true;
+                pos = i;
+            }
             runOnUiThread{
                 printLog(mapList[i].name)
                 printLog(mapList[i].id)
@@ -730,38 +750,23 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         // if was found, load map with id
         else {
             if (id.equals("")) newId = mapList[0].id
-            runOnUiThread{
+            runOnUiThread {
                 printLog("loading map with id: $id");
             }
+            val requestId =
+                robot.loadMap(
+                    newId,
+                    reposeRequired,
+                    position,
+                    offline = offline,
+                    withoutUI = withoutUI
+                )
+            runOnUiThread {
+                printLog("Loading map: ${mapList[pos]}, request id $requestId, reposeRequired $reposeRequired, position $position, offline $offline, withoutUI $withoutUI")
+            }
+
+
         }
-
-//        val map: MapModel = MapModel();
-//        if (mapList.indexOf() == -1){
-//            runOnUiThread{
-//                printLog("no map with id: $id found!");
-//            }
-//            break;
-//        }
-
-//        val mapListAdapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, mapListString)
-//        val builder = AlertDialog.Builder(this)
-//        builder.setTitle("Click item to load specific map")
-//        builder.setAdapter(mapListAdapter, null)
-//        val dialog = builder.create()
-//        dialog.listView.onItemClickListener =
-//            OnItemClickListener { _, _, pos: Int, _ ->
-//                val requestId =
-//                    robot.loadMap(
-//                        mapList[pos].id,
-//                        reposeRequired,
-//                        position,
-//                        offline = offline,
-//                        withoutUI = withoutUI
-//                    )
-//                printLog("Loading map: ${mapList[pos]}, request id $requestId, reposeRequired $reposeRequired, position $position, offline $offline, withoutUI $withoutUI")
-//                dialog.dismiss()
-//            }
-//        dialog.show()
     }
 
     private fun getCurrentFloor() {
