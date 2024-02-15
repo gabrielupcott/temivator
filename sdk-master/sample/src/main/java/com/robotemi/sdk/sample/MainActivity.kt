@@ -670,6 +670,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         btnLoadMapNoDialog2.setOnClickListener{
             loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
+        btnChangeSpeed.setOnClickListener { setSpeed() }
     }
 
                                             //    reposeRequired: Boolean,
@@ -767,6 +768,48 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
         }
+    }
+
+    /**
+     * Function to set goTo speed. Can also be set during goTo() method call with the following:
+     *
+     * robot.goTo(
+     *      SetGoTo.text.toString().lowercase().trim { it <= ' ' },
+     *      backwards = false,
+     *      noBypass = false,
+     *      speedLevel = SpeedLevel.HIGH
+     *      )
+     */
+    private fun setSpeed(){
+        // Check and set permissions for settings and Kiosk
+        if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
+            runOnUiThread {
+                printLog("No permissions")
+            }
+            requestSettings()
+            return
+        }
+        requestToBeKioskApp()
+        printLog("Current go to speed ${robot.goToSpeed}")
+
+        // Setup dialogue to change speed level
+        val speedLevels: MutableList<String> = ArrayList()
+        speedLevels.add(SpeedLevel.HIGH.value)
+        speedLevels.add(SpeedLevel.MEDIUM.value)
+        speedLevels.add(SpeedLevel.SLOW.value)
+        val adapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, speedLevels)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Go To Speed Level")
+            .setAdapter(adapter, null)
+            .create()
+        dialog.listView.onItemClickListener =
+            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                // Actually change speed level
+                robot.goToSpeed = SpeedLevel.valueToEnum(adapter.getItem(position)!!)
+                printLog("Set go to speed to: ${adapter.getItem(position)}")
+                dialog.dismiss()
+            }
+        dialog.show()
     }
 
     private fun getCurrentFloor() {
@@ -1109,7 +1152,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     etGoTo.text.toString().lowercase().trim { it <= ' ' },
                     backwards = false,
                     noBypass = false,
-                    speedLevel = SpeedLevel.HIGH
+//                    modified line below from permanently being set to HIGH
+                    speedLevel = robot.goToSpeed
                 )
                 hideKeyboard()
             }
