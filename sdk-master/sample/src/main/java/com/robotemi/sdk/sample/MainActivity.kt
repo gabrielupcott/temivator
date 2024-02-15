@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     private val assistantReceiver = AssistantChangeReceiver()
 
+    private var sequenceNum = 0
+
     private val telepresenceStatusChangedListener: OnTelepresenceStatusChangedListener by lazy {
         object : OnTelepresenceStatusChangedListener("") {
             override fun onTelepresenceStatusChanged(callState: CallState) {
@@ -676,8 +678,21 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          */
 
         btnTest1.setOnClickListener{doTest1()}
+        btnListMaps.setOnClickListener{getMapListBtn()}
+        btnLoadMapNoDialog.setOnClickListener{
+            loadMapNoDialog(reposeRequired = false, position = Position(4.5F, 0.083F, -1.6F, 23), offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
+        }
+        btnLoadMapNoDialog2.setOnClickListener{
+            loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
+        }
+        btnChangeSpeed.setOnClickListener { setSpeed() }
     }
 
+                                            //    reposeRequired: Boolean,
+                                            //    position: Position?,
+                                            //    offline: Boolean = false,
+                                            //    withoutUI: Boolean = false,
+                                            //    id: String = ""
     /**
      * This is where the onClick functions for the Elevator tab buttons are
      */
@@ -694,6 +709,123 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the actual logic should be written
          */
+    }
+
+    /**
+     * Modified version of loadMap function with dialog removed. ID is hardcoded in the onClick handler above.
+     *
+     *
+     * reposeRequired: Boolean: Whether the robot needs to reposition itself upon loading.
+     * position: Position: The position of the robot within the new map
+     * offline: Boolean: Whether to load the map online or offline
+     * withoutUI: Boolean: Whether to show the map loading UI
+     * id: String: The ID of the new map to load
+     */
+    private fun loadMapNoDialog(
+        reposeRequired: Boolean,
+        position: Position?,
+        offline: Boolean = true,
+        withoutUI: Boolean = true,
+        id: String = ""
+    ) {
+        // newId var is for parameter for new map to be loaded
+        var newId: String = id;
+        // pos var to save pos of found map with id
+        var pos: Int = 0;
+        // found var for flag if map to change to is in stored list or not
+        var found: Boolean = false;
+        if (mapList.isEmpty()) {
+            getMapList()
+        }
+        if (robot.checkSelfPermission(Permission.MAP) != Permission.GRANTED) {
+            runOnUiThread{
+                printLog("No permissions")
+            }
+            return
+        }
+        val mapListString: MutableList<String> = ArrayList()
+        for (i in mapList.indices) {
+            mapListString.add(mapList[i].name)
+            // if it found map with id, set found flag to true
+            if (mapList[i].id.equals(newId)) {
+                found = true;
+                pos = i;
+            }
+            runOnUiThread{
+                printLog(mapList[i].name)
+                printLog(mapList[i].id)
+            }
+        }
+
+        // if not found, print and dont do anything
+        if (!found){
+            runOnUiThread{
+                printLog("no map with id: $id found!");
+            }
+        }
+        // if was found, load map with id
+        else {
+            if (id.equals("")) newId = mapList[0].id
+            runOnUiThread {
+                printLog("loading map with id: $id");
+            }
+            val requestId =
+                robot.loadMap(
+                    newId,
+                    reposeRequired,
+                    position,
+                    offline = offline,
+                    withoutUI = withoutUI
+                )
+            runOnUiThread {
+                printLog("Loading map: ${mapList[pos]}, request id $requestId, reposeRequired $reposeRequired, position $position, offline $offline, withoutUI $withoutUI")
+            }
+
+
+        }
+        btnWillsTestButton.setOnClickListener { WillsGoTo() }
+    }
+
+    /**
+     * Function to set goTo speed. Can also be set during goTo() method call with the following:
+     *
+     * robot.goTo(
+     *      SetGoTo.text.toString().lowercase().trim { it <= ' ' },
+     *      backwards = false,
+     *      noBypass = false,
+     *      speedLevel = SpeedLevel.HIGH
+     *      )
+     */
+    private fun setSpeed(){
+        // Check and set permissions for settings and Kiosk
+        if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
+            runOnUiThread {
+                printLog("No permissions")
+            }
+            requestSettings()
+            return
+        }
+        requestToBeKioskApp()
+        printLog("Current go to speed ${robot.goToSpeed}")
+
+        // Setup dialogue to change speed level
+        val speedLevels: MutableList<String> = ArrayList()
+        speedLevels.add(SpeedLevel.HIGH.value)
+        speedLevels.add(SpeedLevel.MEDIUM.value)
+        speedLevels.add(SpeedLevel.SLOW.value)
+        val adapter = ArrayAdapter(this, R.layout.item_dialog_row, R.id.name, speedLevels)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Go To Speed Level")
+            .setAdapter(adapter, null)
+            .create()
+        dialog.listView.onItemClickListener =
+            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                // Actually change speed level
+                robot.goToSpeed = SpeedLevel.valueToEnum(adapter.getItem(position)!!)
+                printLog("Set go to speed to: ${adapter.getItem(position)}")
+                dialog.dismiss()
+            }
+        dialog.show()
     }
 
     private fun getCurrentFloor() {
@@ -1036,11 +1168,52 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     etGoTo.text.toString().lowercase().trim { it <= ' ' },
                     backwards = false,
                     noBypass = false,
-                    speedLevel = SpeedLevel.HIGH
+//                    modified line below from permanently being set to HIGH
+                    speedLevel = robot.goToSpeed
                 )
                 hideKeyboard()
             }
         }
+    }
+
+    /**
+     * Test functionality of going to an elevator, then into, then out of, then home
+     */
+    private fun WillsGoTo() {
+
+        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
+        var myLocation = myLocations[sequenceNum]
+        runOnUiThread {
+            printLog("\nTrying to go to location: $myLocation")
+        }
+        for (location in robot.locations) {
+            if (location.lowercase() == myLocation.lowercase()
+                    .trim { it <= ' ' }
+            ) {
+                robot.goTo(
+                    myLocation.lowercase().trim { it <= ' ' },
+                    backwards = false,
+                    noBypass = false,
+                    speedLevel = SpeedLevel.HIGH
+                )
+            } else {
+                runOnUiThread {
+                    printLog("\nLocation not found $myLocation")
+                }
+            }
+        }
+        if (myLocation == "home") {
+            runOnUiThread {
+                printLog("\nYou are home.  I'm going back to the main screen")
+            }
+        }
+        else {
+            var nextLoc = myLocations[sequenceNum + 1]
+            runOnUiThread {
+                printLog("\nPress button again to go to next location: $nextLoc")
+            }
+        }
+        sequenceNum++
     }
 
     /**
