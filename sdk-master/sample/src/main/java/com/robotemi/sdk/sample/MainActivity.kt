@@ -118,6 +118,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     private val assistantReceiver = AssistantChangeReceiver()
 
+    private var sequenceNum = 0
+
     private val telepresenceStatusChangedListener: OnTelepresenceStatusChangedListener by lazy {
         object : OnTelepresenceStatusChangedListener("") {
             override fun onTelepresenceStatusChanged(callState: CallState) {
@@ -768,6 +770,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
         }
+        btnWillsTestButton.setOnClickListener { WillsGoTo() }
     }
 
     /**
@@ -1158,6 +1161,46 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 hideKeyboard()
             }
         }
+    }
+
+    /**
+     * Test functionality of going to an elevator, then into, then out of, then home
+     */
+    private fun WillsGoTo() {
+
+        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
+        var myLocation = myLocations[sequenceNum]
+        runOnUiThread {
+            printLog("\nTrying to go to location: $myLocation")
+        }
+        for (location in robot.locations) {
+            if (location.lowercase() == myLocation.lowercase()
+                    .trim { it <= ' ' }
+            ) {
+                robot.goTo(
+                    myLocation.lowercase().trim { it <= ' ' },
+                    backwards = false,
+                    noBypass = false,
+                    speedLevel = SpeedLevel.HIGH
+                )
+            } else {
+                runOnUiThread {
+                    printLog("\nLocation not found $myLocation")
+                }
+            }
+        }
+        if (myLocation == "home") {
+            runOnUiThread {
+                printLog("\nYou are home.  I'm going back to the main screen")
+            }
+        }
+        else {
+            var nextLoc = myLocations[sequenceNum + 1]
+            runOnUiThread {
+                printLog("\nPress button again to go to next location: $nextLoc")
+            }
+        }
+        sequenceNum++
     }
 
     /**
