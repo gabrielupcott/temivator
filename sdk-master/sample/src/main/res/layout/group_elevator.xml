@@ -53,7 +53,6 @@
         style="@style/ButtonCommon"
         android:layout_width="325dp"
         android:layout_height="wrap_content"
-        android:onClick="WillsGoTo"
         android:text="Will's Test Button" />
 
 

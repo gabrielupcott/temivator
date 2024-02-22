@@ -686,6 +686,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
         btnChangeSpeed.setOnClickListener { setSpeed() }
+        btnWillsTestButton.setOnClickListener { WillsGoTo() }
     }
 
                                             //    reposeRequired: Boolean,
@@ -783,7 +784,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
         }
-        btnWillsTestButton.setOnClickListener { WillsGoTo() }
     }
 
     /**
