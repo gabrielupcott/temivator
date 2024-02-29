@@ -738,7 +738,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
 
-
     /**
      * Method to test on the new button
      */
@@ -762,30 +761,30 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         var foundLocation = false
         for (location in robot.locations) {
 
+            if(sequenceNum == 1) {
+                robot.speak(create("---Please open the elevator for me" , false, cached = true))
+            }
+
             if(myLocation.equals("ea3outpasselev")) {
                 runOnUiThread {
                     printLog("\n\n working \n\n")
-                    robot.speak(create("Open the door" , false, cached = true))
+                    robot.speak(create("---Open the door" , false, cached = true))
                 }
             }
 
-            robot.speak(create("WORKING" , false, cached = true))
 
-            runOnUiThread {
-                printLog("\n\n $sequenceNum \n\n")
-                robot.speak(create("WORKING IN THREAD" , false, cached = true))
-            }
+
 
             if (location.lowercase() == myLocation.lowercase()
                     .trim { it <= ' ' }
             ) {
 
-//                robot.goTo(
-//                    myLocation.lowercase().trim { it <= ' ' },
-//                    backwards = false,
-//                    noBypass = false,
-//                    speedLevel = SpeedLevel.HIGH
-//                )
+                robot.goTo(
+                    myLocation.lowercase().trim { it <= ' ' },
+                    backwards = false,
+                    noBypass = false,
+                    speedLevel = SpeedLevel.HIGH
+                )
 
 
             } else {
@@ -802,7 +801,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         else if (myLocation == "ea3outpasselev") {
             runOnUiThread {
-                robot.speak(create("Please push the elevator button for me!", false))
+                robot.speak(create("---Please push the elevator button for me!", false))
             }
         }
         else {

@@ -10,7 +10,7 @@ import java.util.*
  */
 data class TtsRequest(
     val id: UUID = UUID.randomUUID(),
-    val speech: String,
+    var speech: String,
     var packageName: String = "",
     var status: Status = Status.PENDING,
     val drawableBitmap: Bitmap? = null,
