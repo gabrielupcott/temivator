@@ -108,6 +108,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     TextToSpeech.OnInitListener, OnLoadFloorStatusChangedListener,
     OnDistanceToDestinationChangedListener, OnSdkExceptionListener, OnRobotDragStateChangedListener {
 
+    private var EA3_wing_floorId = "1638818F1620F03A726457879BD152BF"
+
     private lateinit var robot: Robot
 
     private val executorService = Executors.newSingleThreadExecutor()
@@ -273,14 +275,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         super.onDestroy()
     }
 
-    /**
-     * Method to test on the new button
-     */
-    private fun responseAtElevator() {
-        robot.speak(create("Please push the elevator button for me!", false))
-        //Get an answer from the user - listen to response
 
-    }
+
+
+
+
+
 
     private fun initOnClickListener() {
         btnGroupSystem.setOnCheckedChangeListener { _, isChecked ->
@@ -694,6 +694,30 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                                             //    offline: Boolean = false,
                                             //    withoutUI: Boolean = false,
                                             //    id: String = ""
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * OUR CODE FOR TEMI
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+
+
+
+
     /**
      * This is where the onClick functions for the Elevator tab buttons are
      */
@@ -710,6 +734,84 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the actual logic should be written
          */
+    }
+
+
+
+
+    /**
+     * Method to test on the new button
+     */
+    private fun responseAtElevator() {
+        robot.speak(create("Please push the elevator button for me!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * Test functionality of going to an elevator, then into, then out of, then home
+     */
+    private fun WillsGoTo() {
+
+
+        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
+        var myLocation = myLocations[sequenceNum]
+        runOnUiThread {
+            printLog("\nTrying to go to location: $myLocation")
+        }
+        var foundLocation = false
+        for (location in robot.locations) {
+
+            if(myLocation.equals("ea3outpasselev")) {
+                runOnUiThread {
+                    printLog("\n\n working \n\n")
+                    robot.speak(create("Open the door" , false, cached = true))
+                }
+            }
+
+            robot.speak(create("WORKING" , false, cached = true))
+
+            runOnUiThread {
+                printLog("\n\n $sequenceNum \n\n")
+                robot.speak(create("WORKING IN THREAD" , false, cached = true))
+            }
+
+            if (location.lowercase() == myLocation.lowercase()
+                    .trim { it <= ' ' }
+            ) {
+
+//                robot.goTo(
+//                    myLocation.lowercase().trim { it <= ' ' },
+//                    backwards = false,
+//                    noBypass = false,
+//                    speedLevel = SpeedLevel.HIGH
+//                )
+
+
+            } else {
+                runOnUiThread {
+                    printLog("\nLocation not found $myLocation")
+                }
+            }
+        }
+        if (myLocation == "home base") {
+            runOnUiThread {
+                printLog("\nYou are home.  I'm going back to the main screen")
+            }
+        }
+
+        else if (myLocation == "ea3outpasselev") {
+            runOnUiThread {
+                robot.speak(create("Please push the elevator button for me!", false))
+            }
+        }
+        else {
+            var nextLoc = myLocations[sequenceNum + 1]
+            runOnUiThread {
+                printLog("\nPress button again to go to next location: $nextLoc")
+            }
+        }
+        sequenceNum++
     }
 
     /**
@@ -1161,6 +1263,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      */
     private fun goTo() {
         for (location in robot.locations) {
+
+
             if (location == etGoTo.text.toString().lowercase()
                     .trim { it <= ' ' }
             ) {
@@ -1176,45 +1280,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    /**
-     * Test functionality of going to an elevator, then into, then out of, then home
-     */
-    private fun WillsGoTo() {
 
-        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
-        var myLocation = myLocations[sequenceNum]
-        runOnUiThread {
-            printLog("\nTrying to go to location: $myLocation")
-        }
-        for (location in robot.locations) {
-            if (location.lowercase() == myLocation.lowercase()
-                    .trim { it <= ' ' }
-            ) {
-                robot.goTo(
-                    myLocation.lowercase().trim { it <= ' ' },
-                    backwards = false,
-                    noBypass = false,
-                    speedLevel = SpeedLevel.HIGH
-                )
-            } else {
-                runOnUiThread {
-                    printLog("\nLocation not found $myLocation")
-                }
-            }
-        }
-        if (myLocation == "home") {
-            runOnUiThread {
-                printLog("\nYou are home.  I'm going back to the main screen")
-            }
-        }
-        else {
-            var nextLoc = myLocations[sequenceNum + 1]
-            runOnUiThread {
-                printLog("\nPress button again to go to next location: $nextLoc")
-            }
-        }
-        sequenceNum++
-    }
 
     /**
      * stopMovement() is used whenever you want the robot to stop any movement
@@ -2627,4 +2693,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     override fun onRobotDragStateChanged(isDragged: Boolean) {
         printLog("onRobotDragStateChanged $isDragged")
     }
+
+
+
 }
