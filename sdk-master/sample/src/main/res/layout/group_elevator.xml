@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
+    android:visibility="visible"
     tools:ignore="HardcodedText">
 
     <Button
@@ -55,6 +57,41 @@
         android:layout_height="wrap_content"
         android:text="Will's Test Button" />
 
+    <Button
+        android:id="@+id/btnImageProcessing"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Image Processing" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.robotemi.sdk.sample.GraphicOverlay
+            android:id="@+id/graphic_overlay"
+            android:layout_width="225dp"
+            android:layout_height="276dp"
+            android:layout_marginStart="527dp"
+            android:layout_marginEnd="528dp"
+            android:layout_marginBottom="44dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.robotemi.sdk.sample.CameraSourcePreview
+            android:id="@+id/preview_view"
+            android:layout_width="225dp"
+            android:layout_height="276dp"
+            android:layout_marginStart="527dp"
+            android:layout_marginEnd="528dp"
+            android:layout_marginBottom="44dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/graphic_overlay" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

@@ -9,6 +9,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
@@ -39,7 +40,17 @@ import android.widget.Toast
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
+import com.google.mlkit.common.model.LocalModel
+import com.google.mlkit.vision.barcode.ZoomSuggestionOptions
+import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
+import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
+import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
+import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
+import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.robotemi.sdk.*
 import com.robotemi.sdk.Robot.*
 import com.robotemi.sdk.Robot.Companion.getInstance
@@ -68,6 +79,7 @@ import com.robotemi.sdk.navigation.model.SafetyLevel
 import com.robotemi.sdk.navigation.model.SpeedLevel
 import com.robotemi.sdk.permission.OnRequestPermissionResultListener
 import com.robotemi.sdk.permission.Permission
+import com.robotemi.sdk.sample.preference.PreferenceUtils
 import com.robotemi.sdk.sequence.OnSequencePlayStatusChangedListener
 import com.robotemi.sdk.sequence.SequenceModel
 import com.robotemi.sdk.telepresence.CallState
@@ -82,6 +94,7 @@ import kotlinx.android.synthetic.main.group_buttons.*
 import kotlinx.android.synthetic.main.group_map_and_movement.*
 import kotlinx.android.synthetic.main.group_resources.*
 import kotlinx.android.synthetic.main.group_elevator.*
+import com.robotemi.sdk.sample.objectdetector.ObjectDetectorProcessor
 //import kotlinx.android.synthetic.main.group_elevator.*
 import kotlinx.android.synthetic.main.group_settings_and_status.*
 import java.io.File
@@ -687,6 +700,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
         btnChangeSpeed.setOnClickListener { setSpeed() }
         btnWillsTestButton.setOnClickListener { WillsGoTo() }
+        btnImageProcessing.setOnClickListener { startImageProcessing() }
     }
 
                                             //    reposeRequired: Boolean,
@@ -721,6 +735,113 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     /**
      * This is where the onClick functions for the Elevator tab buttons are
      */
+
+    private var cameraSource: CameraSource? = null
+    private var preview: CameraSourcePreview? = null
+    private var graphicOverlay: GraphicOverlay? = null
+    private var selectedModel = "Object Detection"
+
+    private fun allRuntimePermissionsGranted(): Boolean {
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
+            permission?.let {
+                if (!isPermissionGranted(this, it)) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    private fun getRuntimePermissions() {
+        val permissionsToRequest = ArrayList<String>()
+        for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
+            permission?.let {
+                if (!isPermissionGranted(this, it)) {
+                    permissionsToRequest.add(permission)
+                }
+            }
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray(),
+                PERMISSION_REQUESTS
+            )
+        }
+    }
+
+    private fun isPermissionGranted(context: Context, permission: String): Boolean {
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.i(TAG, "Permission granted: $permission")
+            return true
+        }
+        Log.i(TAG, "Permission NOT granted: $permission")
+        return false
+    }
+
+    private fun startImageProcessing(){
+        if (!allRuntimePermissionsGranted()) {
+            getRuntimePermissions()
+        }
+        preview = findViewById(R.id.preview_view)
+        graphicOverlay = findViewById(R.id.graphic_overlay)
+        createCameraSource(selectedModel)
+        if (cameraSource != null){
+            startCameraSource()
+        }
+    }
+
+    private fun createCameraSource(model: String) {
+        // If there's no existing cameraSource, create one.
+        if (cameraSource == null) {
+            cameraSource = CameraSource(this, graphicOverlay)
+        }
+        try {
+            when (model) {
+                "Object Detection" -> {
+                    //Log.i(TAG, "Using Object Detector Processor")
+                    val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+                    cameraSource!!.setMachineLearningFrameProcessor(
+                        ObjectDetectorProcessor(this, objectDetectorOptions)
+                    )
+                }
+                //else -> //Log.e(TAG, "Unknown model: $model")
+            }
+        } catch (e: Exception) {
+            //Log.e(TAG, "Can not create image processor: $model", e)
+            Toast.makeText(
+                applicationContext,
+                "Can not create image processor: " + e.message,
+                Toast.LENGTH_LONG
+            )
+                .show()
+        }
+    }
+
+    /**
+    * Starts or restarts the camera source, if it exists. If the camera source doesn't exist yet
+    * (e.g., because onResume was called before the camera source was created), this will be called
+    * again when the camera source is created.
+    */
+    private fun startCameraSource() {
+        if (cameraSource != null) {
+            try {
+                if (preview == null) {
+                    //Log.d(TAG, "resume: Preview is null")
+                }
+                if (graphicOverlay == null) {
+                    //Log.d(TAG, "resume: graphOverlay is null")
+                }
+                preview!!.start(cameraSource, graphicOverlay)
+            } catch (e: IOException) {
+                //Log.e(TAG, "Unable to start camera source.", e)
+                cameraSource!!.release()
+                cameraSource = null
+            }
+        }
+    }
 
     private fun doTest1(){
 
@@ -2486,6 +2607,16 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     companion object {
+        private const val TAG = "EntryChoiceActivity"
+        private const val PERMISSION_REQUESTS = 1
+
+        private val REQUIRED_RUNTIME_PERMISSIONS =
+            arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+
         const val ACTION_HOME_WELCOME = "home.welcome"
         const val ACTION_HOME_DANCE = "home.dance"
         const val ACTION_HOME_SLEEP = "home.sleep"
