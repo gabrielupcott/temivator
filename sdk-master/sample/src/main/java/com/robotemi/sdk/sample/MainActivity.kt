@@ -677,6 +677,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
+        GoToElevatorButton.setOnClickListener { GoToElevator() }
         btnTest1.setOnClickListener{doTest1()}
         btnListMaps.setOnClickListener{getMapListBtn()}
         btnLoadMapNoDialog.setOnClickListener{
@@ -710,13 +711,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      *
      *
      *
-     *
-     *
-     *
      */
-
-
-
 
     /**
      * This is where the onClick functions for the Elevator tab buttons are
@@ -742,15 +737,62 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * Method to test on the new button
      */
     private fun responseAtElevator() {
-        robot.speak(create("Please push the elevator button for me!", false))
+        robot.speak(create("---Please push the elevator button for me!", false))
         //Get an answer from the user - listen to response
 
     }
 
-
-    private fun GoToElevator() {
+    /**
+     * Go to a specified location
+     * @param destination The location to go to
+     */
+    private fun goToLocation(destination: String) {
+        //error message
 
     }
+
+
+
+
+    private fun GoToElevator() {
+        val destination: String = "Infrontelevator"
+
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response
+                            responseAtElevator()
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
+
+
+
 
 
     private fun GoInsideElvator() {
