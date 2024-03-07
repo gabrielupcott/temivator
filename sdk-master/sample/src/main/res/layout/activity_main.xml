@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
@@ -291,9 +292,10 @@
 
         <TextView
             android:id="@+id/tvLog"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="547dp"
+            android:layout_height="467dp"
             android:layout_below="@id/visualizerView"
+            android:layout_marginTop="153dp"
             android:layout_marginBottom="50dp"
             android:lineSpacingExtra="5dp"
             android:padding="20dp"
@@ -301,6 +303,40 @@
             android:textColor="@color/colorWhite"
             android:textSize="16sp"
             tools:text="log pasdfasfasdfasfasdfanel" />
+
+        <com.robotemi.sdk.sample.CameraSourcePreview
+            android:id="@+id/preview_view2"
+            android:layout_width="225dp"
+            android:layout_height="276dp"
+            android:layout_above="@+id/btnClearLog"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="196dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginEnd="219dp"
+            android:layout_marginBottom="400dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+             />
+
+        <com.robotemi.sdk.sample.GraphicOverlay
+            android:id="@+id/graphic_overlay3"
+            android:layout_width="225dp"
+            android:layout_height="276dp"
+            android:layout_above="@+id/btnClearLog"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="194dp"
+            android:layout_marginTop="13dp"
+            android:layout_marginEnd="221dp"
+            android:layout_marginBottom="393dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/btnClearLog"

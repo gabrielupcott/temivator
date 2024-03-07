@@ -42,15 +42,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
-import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.barcode.ZoomSuggestionOptions
-import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
-import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
-import com.google.mlkit.vision.text.devanagari.DevanagariTextRecognizerOptions
-import com.google.mlkit.vision.text.japanese.JapaneseTextRecognizerOptions
-import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.robotemi.sdk.*
 import com.robotemi.sdk.Robot.*
 import com.robotemi.sdk.Robot.Companion.getInstance
@@ -785,8 +776,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         if (!allRuntimePermissionsGranted()) {
             getRuntimePermissions()
         }
-        preview = findViewById(R.id.preview_view)
-        graphicOverlay = findViewById(R.id.graphic_overlay)
+        preview = findViewById(R.id.preview_view2)
+        graphicOverlay = findViewById(R.id.graphic_overlay3)
         createCameraSource(selectedModel)
         if (cameraSource != null){
             startCameraSource()
@@ -835,6 +826,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     //Log.d(TAG, "resume: graphOverlay is null")
                 }
                 preview!!.start(cameraSource, graphicOverlay)
+                //preview!!.start(cameraSource, graphicOverlay)
             } catch (e: IOException) {
                 //Log.e(TAG, "Unable to start camera source.", e)
                 cameraSource!!.release()
