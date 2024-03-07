@@ -747,33 +747,46 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     }
 
+
+    private fun GoToElevator() {
+
+    }
+
+
+    private fun GoInsideElvator() {
+
+    }
+
+    private fun WaitInsideElevator() {
+
+    }
+
     /**
      * Test functionality of going to an elevator, then into, then out of, then home
      */
     private fun WillsGoTo() {
-
-
         var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
         var myLocation = myLocations[sequenceNum]
+        //error message
         runOnUiThread {
             printLog("\nTrying to go to location: $myLocation")
         }
-        var foundLocation = false
+
         for (location in robot.locations) {
 
-            if(sequenceNum == 1) {
-                robot.speak(create("---Please open the elevator for me" , false, cached = true))
-            }
-
-            if(myLocation.equals("ea3outpasselev")) {
+            if(myLocation == "ea3outpasselev") {
                 runOnUiThread {
                     printLog("\n\n working \n\n")
-                    robot.speak(create("---Open the door" , false, cached = true))
+                    robot.speak(create("---Going to elevator" , false, cached = true))
                 }
             }
 
-
-
+            if(myLocation == "ea3inpasselev") {
+                runOnUiThread {
+                    printLog("\n\n working \n\n")
+                    robot.speak(create("---Please open the elevator" , false, cached = true))
+                }
+            }
 
             if (location.lowercase() == myLocation.lowercase()
                     .trim { it <= ' ' }
@@ -799,7 +812,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         }
 
-        else if (myLocation == "ea3outpasselev") {
+        else if (myLocation == "ea3inpasselev") {
             runOnUiThread {
                 robot.speak(create("---Please push the elevator button for me!", false))
             }
