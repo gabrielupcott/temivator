@@ -677,6 +677,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
+        ExitElevator.setOnClickListener { ExitElevator() }
+        GoInsideElevatorButton.setOnClickListener { GoInsideElevator() }
         GoToElevatorButton.setOnClickListener { GoToElevator() }
         btnTest1.setOnClickListener{doTest1()}
         btnListMaps.setOnClickListener{getMapListBtn()}
@@ -743,6 +745,24 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     /**
+     * What to speak inside the elevator
+     */
+    private fun responseInElevator() {
+        robot.speak(create("---Waiting to exit the elevator Master!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * What to speak outside the elevator ( essentially the arrive method )
+     */
+    private fun responseUponExit(destination : String) {
+        robot.speak(create("---Arrived at $destination", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
      * Go to a specified location
      * @param destination The location to go to
      */
@@ -795,12 +815,78 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
 
-    private fun GoInsideElvator() {
+    private fun GoInsideElevator() {
+        val destination: String = "inside_elevator"
 
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response - callback function
+                            responseInElevator()
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
     }
 
-    private fun WaitInsideElevator() {
+    private fun ExitElevator() {
+        val destination: String = "homebase"
 
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response - callback function
+                            responseUponExit(location)
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
     }
 
     /**

@@ -62,5 +62,19 @@
         android:layout_height="wrap_content"
         android:text="Go To Elevator" />
 
+    <Button
+        android:id="@+id/GoInsideElevatorButton"
+        style="@style/ButtonCommon"
+        android:layout_height="wrap_content"
+        android:layout_width="325dp"
+        android:text="Go inside elevator" />
+
+    <Button
+        android:id="@+id/ExitElevator"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Exit Elevator" />
+
 
 </LinearLayout>
