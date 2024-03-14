@@ -677,9 +677,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
-        ExitElevator.setOnClickListener { ExitElevator() }
-        GoInsideElevatorButton.setOnClickListener { GoInsideElevator() }
-        GoToElevatorButton.setOnClickListener { GoToElevator() }
+        ExitElevator.setOnClickListener { ExitElevator() } //new method
+        GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
+        GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
         btnTest1.setOnClickListener{doTest1()}
         btnListMaps.setOnClickListener{getMapListBtn()}
         btnLoadMapNoDialog.setOnClickListener{
@@ -757,7 +757,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * What to speak outside the elevator ( essentially the arrive method )
      */
     private fun responseUponExit(destination : String) {
-        robot.speak(create("---Arrived at $destination", false))
+        robot.speak(create("---Arrived at cyber security room",false))
         //Get an answer from the user - listen to response
 
     }
@@ -796,7 +796,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 ) {
                     if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
                         runOnUiThread {
-                            printLog("\nSuccessfully arrived at $location")
+                            printLog("\nSuccessfully arrived at $location Gabe")
                             // Voice Response
                             responseAtElevator()
                         }
@@ -853,7 +853,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun ExitElevator() {
-        val destination: String = "homebase"
+        val destination: String = "arrivedDestination"
 
         try {
             // Start the robot movement
