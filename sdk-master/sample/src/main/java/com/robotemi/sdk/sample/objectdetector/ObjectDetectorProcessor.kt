@@ -17,7 +17,9 @@
 package com.robotemi.sdk.sample.objectdetector
 
 import android.content.Context
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.Gravity
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 //import com.google.mlkit.vision.demo.kotlin.objectdetector.ObjectGraphic
@@ -27,6 +29,7 @@ import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.ObjectDetectorOptionsBase
 import com.robotemi.sdk.sample.GraphicOverlay
 import com.robotemi.sdk.sample.VisionProcessorBase
+import kotlinx.android.synthetic.main.activity_main.tvLog
 import java.io.IOException
 
 /** A processor to run object detector.  */
@@ -48,15 +51,26 @@ class ObjectDetectorProcessor(context: Context, options: ObjectDetectorOptionsBa
     }
   }
 
-  override fun detectInImage(image: InputImage): Task<List<DetectedObject>> {
+  public override fun detectInImage(image: InputImage): Task<List<DetectedObject>> {
     return detector.process(image)
   }
 
-  override fun onSuccess(results: List<DetectedObject>, graphicOverlay: GraphicOverlay) {
+  public override fun onSuccess(results: List<DetectedObject>, graphicOverlay: GraphicOverlay) {
     for (result in results) {
       graphicOverlay.add(ObjectGraphic(graphicOverlay, result))
+      Log.e(TAG, "Detection: ${result.labels}")
+      //printLog()
     }
   }
+
+//  private fun printLog(tag: String, msg: String, show: Boolean = true) {
+//    Log.d(tag.ifEmpty { "MainActivity" }, msg)
+//    if (!show) return
+//    tvLog.movementMethod = ScrollingMovementMethod.getInstance()
+//    tvLog.gravity = Gravity.BOTTOM
+//    tvLog.append("· $msg \n")
+//
+//  }
 
   override fun onFailure(e: Exception) {
     Log.e(TAG, "Object detection failed!", e)

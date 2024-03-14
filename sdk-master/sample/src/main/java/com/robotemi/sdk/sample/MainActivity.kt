@@ -15,8 +15,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
+import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Picture
+import android.media.Image
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Environment
@@ -41,6 +44,7 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.createBitmap
 import com.google.gson.Gson
 import com.robotemi.sdk.*
 import com.robotemi.sdk.Robot.*
@@ -94,6 +98,10 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.common.InputImage.fromBitmap
+//import com.google.mlkit.vision.common.InputImage
+import java.io.InputStream
 
 
 class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
@@ -776,15 +784,55 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         if (!allRuntimePermissionsGranted()) {
             getRuntimePermissions()
         }
-        preview = findViewById(R.id.preview_view2)
-        graphicOverlay = findViewById(R.id.graphic_overlay3)
-        createCameraSource(selectedModel)
-        if (cameraSource != null){
-            startCameraSource()
+        else {
+            preview = findViewById(R.id.preview_view2)
+            graphicOverlay = findViewById(R.id.graphic_overlay3)
+            val processor = createCameraSource(selectedModel)
+            if (cameraSource != null){
+                startCameraSource()
+            }
+            //runOnUiThread {
+                //while (true){
+                    var assetManager: AssetManager? = null
+                    var istr: InputStream? = null
+                    var bmp: Bitmap? = null
+                    var loaded = false
+                    try {
+                        //val ims = getAssets().open("images.jpeg")
+                        assetManager = assets
+                        istr = assetManager.open("faces/images.jpeg")
+                        bmp = BitmapFactory.decodeStream(istr)
+                        loaded = true
+                        //val d Drawable
+                    } catch (ex: IOException)
+                    {
+                        runOnUiThread {
+                            printLog("\n\n ERROR WITH IMAGE LOADING: " + ex.message)
+                        }
+                    }
+
+                    //preview!!.start(cameraSource, graphicOverlay)
+                    //val bmp = createBitmap(assets.)
+                    if (loaded){
+//                        val image = bmp?.let { fromBitmap(it, 0) }
+//                        val result = image?.let { processor.detectInImage(it) }
+                        runOnUiThread {
+//                            for (item in result){
+//                                printLog("Detection: " + image?.let { processor.detectInImage(it) })
+//
+//                            }
+//                            printLog("Detection: " + image?.let { processor.detectInImage(it) })
+                        }
+                    }
+                //}
+            //}
+
         }
     }
+//    private val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+//    private val processor = ObjectDetectorProcessor(this, objectDetectorOptions)
 
-    private fun createCameraSource(model: String) {
+    private fun createCameraSource(model: String): ObjectDetectorProcessor {
         // If there's no existing cameraSource, create one.
         if (cameraSource == null) {
             cameraSource = CameraSource(this, graphicOverlay)
@@ -794,9 +842,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 "Object Detection" -> {
                     //Log.i(TAG, "Using Object Detector Processor")
                     val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+                    val processor = ObjectDetectorProcessor(this, objectDetectorOptions)
+//                    cameraSource!!.setMachineLearningFrameProcessor(
+//                        ObjectDetectorProcessor(this, objectDetectorOptions)
+//                    )
                     cameraSource!!.setMachineLearningFrameProcessor(
-                        ObjectDetectorProcessor(this, objectDetectorOptions)
+                        processor
                     )
+                    return processor
+
                 }
                 //else -> //Log.e(TAG, "Unknown model: $model")
             }
@@ -809,6 +863,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
                 .show()
         }
+        val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+        return ObjectDetectorProcessor(this, objectDetectorOptions)
     }
 
     /**
@@ -826,7 +882,33 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     //Log.d(TAG, "resume: graphOverlay is null")
                 }
                 preview!!.start(cameraSource, graphicOverlay)
-                //preview!!.start(cameraSource, graphicOverlay)
+//                var assetManager: AssetManager? = null
+//                var istr: InputStream? = null
+//                var bmp: Bitmap? = null
+//                var loaded = false
+//                try {
+//                    //val ims = getAssets().open("images.jpeg")
+//                    assetManager = assets
+//                    istr = assetManager.open("images.jpeg")
+//                    bmp = BitmapFactory.decodeStream(istr)
+//                    loaded = true
+//                    //val d Drawable
+//                } catch (ex: IOException)
+//                {
+//                    runOnUiThread {
+//                        printLog("\n\n ERROR WITH IMAGE LOADING \n\n")
+//                    }
+//                }
+//
+//                //preview!!.start(cameraSource, graphicOverlay)
+//                //val bmp = createBitmap(assets.)
+//                if (loaded){
+//                    val image = bmp?.let { fromBitmap(it, 0) }
+//                    runOnUiThread {
+//                        printLog("Detection: " + image?.let { processor.detectInImage(it) })
+//                    }
+//                }
+
             } catch (e: IOException) {
                 //Log.e(TAG, "Unable to start camera source.", e)
                 cameraSource!!.release()
