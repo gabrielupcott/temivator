@@ -16,7 +16,9 @@ import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Path
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.RemoteException
@@ -33,10 +35,12 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.annotation.CheckResult
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.gson.Gson
@@ -88,6 +92,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 
@@ -119,6 +125,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private val assistantReceiver = AssistantChangeReceiver()
 
     private var sequenceNum = 0
+
+    private var directions = arrayOf("")
 
     private val telepresenceStatusChangedListener: OnTelepresenceStatusChangedListener by lazy {
         object : OnTelepresenceStatusChangedListener("") {
@@ -1163,44 +1171,126 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
+    private fun WillsHideKeyboard(): Runnable? {
+        hideKeyboard()
+        return null
+    }
+
+    private fun WillsGoToLocation(location: String) {
+        printLog(location)
+        // Once the user input is ready, proceed with the rest of the logic
+        sequenceNum = 0
+        // runOnUiThread(WillsHideKeyboard())
+        var pf = PathFinder("EA311", location)
+        directions = pf.getDirections().toTypedArray()
+        //for (dir in directions)
+        //    printLog(dir)
+        WillsShowPopup("Going to location: " + location, "GO!")
+    }
+
+    private fun WillsDoSequence() {
+        do {
+            var myLocation = directions[sequenceNum]
+            var trimLocation = ""
+            var locationFound = false
+            var pause = true;
+            var newMessage = "Press OK to continue"
+            if (myLocation.startsWith("Done")) {
+                runOnUiThread {
+                    printLog("You are at your destination")
+                }
+                return
+            }
+            if (myLocation.startsWith("GOTO")) {
+                myLocation = myLocation.substring(5)
+                runOnUiThread {
+                    printLog("Trying to go to location: $myLocation")
+                }
+                for (location in robot.locations) {
+                    trimLocation = myLocation.lowercase().trim { it <= ' ' }
+                    if (location.lowercase() == trimLocation) {
+                        locationFound = true
+                        break
+                    }
+                }
+                if (locationFound) {
+//            robot.goTo(
+//                trimLocation,
+//                backwards = false,
+//                noBypass = false,
+//                speedLevel = SpeedLevel.HIGH
+//            )
+                } else {
+                    runOnUiThread {
+                        printLog("Location not found $myLocation")
+                    }
+                }
+            } else if (myLocation.startsWith("SPEAK")) {
+                var speak = myLocation.substring(6)
+                runOnUiThread {
+                    printLog("Speak: " + speak)
+                    robot.speak(create(speak))
+                }
+            } else if (myLocation.startsWith("LOADMAP")) {
+                var loadmap = myLocation.substring(8)
+                runOnUiThread {
+                    printLog("Load Map: " + loadmap)
+                }
+                pause = false
+            }
+            sequenceNum++
+            if (pause) {
+                WillsShowPopup(newMessage, "GO!")
+            }
+        } while(!pause)
+    }
+
     /**
      * Test functionality of going to an elevator, then into, then out of, then home
      */
     private fun WillsGoTo() {
+        // Call the function to show the dialog
+        WillsGetDialogInput("Enter Location") { input ->
+            // Store the user input and set the flag to indicate that it's ready
+            WillsGoToLocation(input)
+        }
+    }
 
-        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
-        var myLocation = myLocations[sequenceNum]
-        runOnUiThread {
-            printLog("\nTrying to go to location: $myLocation")
-        }
-        for (location in robot.locations) {
-            if (location.lowercase() == myLocation.lowercase()
-                    .trim { it <= ' ' }
-            ) {
-                robot.goTo(
-                    myLocation.lowercase().trim { it <= ' ' },
-                    backwards = false,
-                    noBypass = false,
-                    speedLevel = SpeedLevel.HIGH
-                )
-            } else {
-                runOnUiThread {
-                    printLog("\nLocation not found $myLocation")
-                }
+    private fun WillsGetDialogInput(
+        title: String,
+        callback: (String) -> Unit
+    ) {
+        val userInput = EditText(this)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setView(userInput)
+            .setPositiveButton("OK") { _, _ ->
+                val inputText = userInput.text.toString()
+                callback.invoke(inputText)
             }
-        }
-        if (myLocation == "home") {
-            runOnUiThread {
-                printLog("\nYou are home.  I'm going back to the main screen")
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.cancel()
             }
-        }
-        else {
-            var nextLoc = myLocations[sequenceNum + 1]
-            runOnUiThread {
-                printLog("\nPress button again to go to next location: $nextLoc")
+            .create()
+        dialog.show()
+    }
+
+
+    private fun WillsShowPopup(message: String, buttonText: String): Boolean {
+        var positiveClicked = false
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(message)
+            .setPositiveButton(buttonText) { dialog, _ ->
+                dialog.dismiss()
+                positiveClicked = true
+                WillsDoSequence()
             }
-        }
-        sequenceNum++
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.cancel()
+            }
+        val dialog = builder.create()
+        dialog.show()
+        return positiveClicked
     }
 
     /**
