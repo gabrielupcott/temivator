@@ -76,5 +76,12 @@
         android:layout_height="wrap_content"
         android:text="Exit Elevator" />
 
+    <Button
+        android:id="@+id/listenerButton"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Listener Button" />
+
 
 </LinearLayout>

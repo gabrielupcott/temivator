@@ -276,12 +276,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
 
-
-
-
-
-
-
     private fun initOnClickListener() {
         btnGroupSystem.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
@@ -677,6 +671,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
+        listenerButton.setOnClickListener { ListenerButton() } //listener button
         ExitElevator.setOnClickListener { ExitElevator() } //new method
         GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
         GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
@@ -770,6 +765,13 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         //error message
 
     }
+
+
+    private fun ListenerButton() {
+        //Todo
+    }
+
+
 
 
 
@@ -1761,6 +1763,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             asrResult.equals("Hello", ignoreCase = true) -> {
                 robot.askQuestion("Hello, I'm temi, what can I do for you?")
             }
+            asrResult.equals("Go to elevator", ignoreCase = true) -> {
+                GoToElevator()
+            }
+
             asrResult.equals("Play music", ignoreCase = true) -> {
                 robot.finishConversation()
                 robot.speak(create("Okay, please enjoy.", false))
