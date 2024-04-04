@@ -37,6 +37,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
@@ -46,6 +47,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import com.google.gson.Gson
+import com.google.mlkit.vision.barcode.ZoomSuggestionOptions
 import com.robotemi.sdk.*
 import com.robotemi.sdk.Robot.*
 import com.robotemi.sdk.Robot.Companion.getInstance
@@ -89,7 +91,6 @@ import kotlinx.android.synthetic.main.group_buttons.*
 import kotlinx.android.synthetic.main.group_map_and_movement.*
 import kotlinx.android.synthetic.main.group_resources.*
 import kotlinx.android.synthetic.main.group_elevator.*
-import com.robotemi.sdk.sample.objectdetector.ObjectDetectorProcessor
 //import kotlinx.android.synthetic.main.group_elevator.*
 import kotlinx.android.synthetic.main.group_settings_and_status.*
 import java.io.File
@@ -100,8 +101,11 @@ import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.common.InputImage.fromBitmap
+import com.google.mlkit.vision.barcode.ZoomSuggestionOptions.ZoomCallback
+import com.google.mlkit.vision.barcode.common.Barcode
 //import com.google.mlkit.vision.common.InputImage
 import java.io.InputStream
+import com.robotemi.sdk.sample.barcodescanner.BarcodeScannerProcessor
 
 
 class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
@@ -698,8 +702,13 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
         btnChangeSpeed.setOnClickListener { setSpeed() }
-        btnWillsTestButton.setOnClickListener { WillsGoTo() }
+        listenerButton.setOnClickListener { ListenerButton() } //listener button
         btnImageProcessing.setOnClickListener { startImageProcessing() }
+        btnPrintBarcodes.setOnClickListener { printBarcodes() }
+        listenerButton.setOnClickListener { ListenerButton() } //listener button
+        ExitElevator.setOnClickListener { ExitElevator() } //new method
+        GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
+        GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
     }
 
                                             //    reposeRequired: Boolean,
@@ -738,7 +747,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private var cameraSource: CameraSource? = null
     private var preview: CameraSourcePreview? = null
     private var graphicOverlay: GraphicOverlay? = null
-    private var selectedModel = "Object Detection"
+    private var selectedModel = "Barcode Scanner"
+    private var detectedBarcode = "";
+    private var arraylist = ArrayList<String>()
+
+    private fun printBarcodes(){
+        printLog("barcodes: ")
+        printLog("barcode: " + detectedBarcode)
+
+    }
 
     private fun allRuntimePermissionsGranted(): Boolean {
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
@@ -787,75 +804,53 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         else {
             preview = findViewById(R.id.preview_view2)
             graphicOverlay = findViewById(R.id.graphic_overlay3)
-            val processor = createCameraSource(selectedModel)
+            createCameraSource(selectedModel)
             if (cameraSource != null){
+//                createCameraSource(selectedModel)
                 startCameraSource()
             }
-            //runOnUiThread {
-                //while (true){
-                    var assetManager: AssetManager? = null
-                    var istr: InputStream? = null
-                    var bmp: Bitmap? = null
-                    var loaded = false
-                    try {
-                        //val ims = getAssets().open("images.jpeg")
-                        assetManager = assets
-                        istr = assetManager.open("faces/images.jpeg")
-                        bmp = BitmapFactory.decodeStream(istr)
-                        loaded = true
-                        //val d Drawable
-                    } catch (ex: IOException)
-                    {
-                        runOnUiThread {
-                            printLog("\n\n ERROR WITH IMAGE LOADING: " + ex.message)
-                        }
-                    }
-
-                    //preview!!.start(cameraSource, graphicOverlay)
-                    //val bmp = createBitmap(assets.)
-                    if (loaded){
-//                        val image = bmp?.let { fromBitmap(it, 0) }
-//                        val result = image?.let { processor.detectInImage(it) }
-                        runOnUiThread {
-//                            for (item in result){
-//                                printLog("Detection: " + image?.let { processor.detectInImage(it) })
-//
-//                            }
-//                            printLog("Detection: " + image?.let { processor.detectInImage(it) })
-                        }
-                    }
-                //}
-            //}
-
         }
     }
-//    private val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-//    private val processor = ObjectDetectorProcessor(this, objectDetectorOptions)
+    //private val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+    private var processor: BarcodeScannerProcessor? = null
 
-    private fun createCameraSource(model: String): ObjectDetectorProcessor {
+    private fun createCameraSource(model: String): BarcodeScannerProcessor {
         // If there's no existing cameraSource, create one.
         if (cameraSource == null) {
             cameraSource = CameraSource(this, graphicOverlay)
         }
         try {
-            when (model) {
-                "Object Detection" -> {
-                    //Log.i(TAG, "Using Object Detector Processor")
-                    val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-                    val processor = ObjectDetectorProcessor(this, objectDetectorOptions)
+//            when (model) {
+//                "Object Detection" -> {
+//                    //Log.i(TAG, "Using Object Detector Processor")
+//                    val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
+//                    processor = ObjectDetectorProcessor(this, objectDetectorOptions)
+////                    cameraSource!!.setMachineLearningFrameProcessor(
+////                        ObjectDetectorProcessor(this, objectDetectorOptions)
+////                    )
 //                    cameraSource!!.setMachineLearningFrameProcessor(
-//                        ObjectDetectorProcessor(this, objectDetectorOptions)
+//                        processor
 //                    )
+//                    return processor as ObjectDetectorProcessor
+//
+//                }
+//                //else -> //Log.e(TAG, "Unknown model: $model")
+//            }
+            when (model) {
+                "Barcode Scanner" -> {
+                    Log.i(TAG, "Using Barcode Detector Processor")
+                    var zoomCallback: ZoomSuggestionOptions.ZoomCallback? = null
+                    if (PreferenceUtils.shouldEnableAutoZoom(this)) {
+                        zoomCallback = ZoomCallback { zoomLevel: Float -> cameraSource!!.setZoom(zoomLevel) }
+                    }
+                    processor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
                     cameraSource!!.setMachineLearningFrameProcessor(
-                        processor
+                        BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
                     )
-                    return processor
-
                 }
-                //else -> //Log.e(TAG, "Unknown model: $model")
             }
         } catch (e: Exception) {
-            //Log.e(TAG, "Can not create image processor: $model", e)
+            Log.e(TAG, "Can not create image processor: $model", e)
             Toast.makeText(
                 applicationContext,
                 "Can not create image processor: " + e.message,
@@ -863,8 +858,11 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
                 .show()
         }
+        Log.e(TAG, "hello")
         val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-        return ObjectDetectorProcessor(this, objectDetectorOptions)
+//        return ObjectDetectorProcessor(this, objectDetectorOptions)
+        var zoomCallback: ZoomSuggestionOptions.ZoomCallback? = null
+        return BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
     }
 
     /**
@@ -876,44 +874,44 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         if (cameraSource != null) {
             try {
                 if (preview == null) {
-                    //Log.d(TAG, "resume: Preview is null")
+                    Log.d(TAG, "resume: Preview is null")
                 }
                 if (graphicOverlay == null) {
-                    //Log.d(TAG, "resume: graphOverlay is null")
+                    Log.d(TAG, "resume: graphOverlay is null")
                 }
                 preview!!.start(cameraSource, graphicOverlay)
-//                var assetManager: AssetManager? = null
-//                var istr: InputStream? = null
-//                var bmp: Bitmap? = null
-//                var loaded = false
-//                try {
-//                    //val ims = getAssets().open("images.jpeg")
-//                    assetManager = assets
-//                    istr = assetManager.open("images.jpeg")
-//                    bmp = BitmapFactory.decodeStream(istr)
-//                    loaded = true
-//                    //val d Drawable
-//                } catch (ex: IOException)
-//                {
-//                    runOnUiThread {
-//                        printLog("\n\n ERROR WITH IMAGE LOADING \n\n")
-//                    }
-//                }
-//
-//                //preview!!.start(cameraSource, graphicOverlay)
-//                //val bmp = createBitmap(assets.)
-//                if (loaded){
-//                    val image = bmp?.let { fromBitmap(it, 0) }
-//                    runOnUiThread {
-//                        printLog("Detection: " + image?.let { processor.detectInImage(it) })
-//                    }
-//                }
 
             } catch (e: IOException) {
-                //Log.e(TAG, "Unable to start camera source.", e)
+                Log.e(TAG, "Unable to start camera source.", e)
                 cameraSource!!.release()
                 cameraSource = null
             }
+        }
+    }
+
+    override fun onNlpCompleted(nlpResult: NlpResult) {
+        //do something with nlp result. Base the action specified in the AndroidManifest.xml
+
+        printLog("NlpCompleted: $nlpResult" )
+
+
+        when (nlpResult.action) {
+            ACTION_HOME_WELCOME -> robot.tiltAngle(23)
+
+            ACTION_HOME_GOTOELEVATOR -> GoToElevator()
+
+            ACTION_HOME_GOINSIDEELEVATOR -> GoInsideElevator()
+
+            ACTION_HOME_FINALDESTINATION -> ExitElevator()
+
+            ACTION_HOME_DANCE -> {
+                val t = System.currentTimeMillis()
+                val end = t + 5000
+                while (System.currentTimeMillis() < end) {
+                    robot.skidJoy(0f, 1f)
+                }
+            }
+            ACTION_HOME_SLEEP -> robot.goTo(HOME_BASE_LOCATION)
         }
     }
 
@@ -938,7 +936,25 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * Method to test on the new button
      */
     private fun responseAtElevator() {
-        robot.speak(create("Please push the elevator button for me!", false))
+        robot.speak(create("---Please push the elevator button for me!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * What to speak inside the elevator
+     */
+    private fun responseInElevator() {
+        robot.speak(create("---Waiting to exit the elevator Master!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * What to speak outside the elevator ( essentially the arrive method )
+     */
+    private fun responseUponExit(destination : String) {
+        robot.speak(create("---Arrived at cyber security room",false))
         //Get an answer from the user - listen to response
 
     }
@@ -946,68 +962,182 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     /**
      * Test functionality of going to an elevator, then into, then out of, then home
      */
-    private fun WillsGoTo() {
+    private fun ListenerButton() {
+        //Todo
+    }
 
+    private fun GoToElevator() {
+        val destination: String = "outside_elevator"
 
-        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
-        var myLocation = myLocations[sequenceNum]
-        runOnUiThread {
-            printLog("\nTrying to go to location: $myLocation")
-        }
-        var foundLocation = false
-        for (location in robot.locations) {
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
 
-            if(myLocation.equals("ea3outpasselev")) {
-                runOnUiThread {
-                    printLog("\n\n working \n\n")
-                    robot.speak(create("Open the door" , false, cached = true))
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at destination")
+                            // Voice Response
+                            responseAtElevator()
+                        }
+                    }
                 }
             }
 
-            robot.speak(create("WORKING" , false, cached = true))
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
 
-            runOnUiThread {
-                printLog("\n\n $sequenceNum \n\n")
-                robot.speak(create("WORKING IN THREAD" , false, cached = true))
+
+
+
+
+    private fun GoInsideElevator() {
+        val destination: String = "elevator"
+
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response - callback function
+                            responseInElevator()
+                        }
+                    }
+                }
             }
 
-            if (location.lowercase() == myLocation.lowercase()
-                    .trim { it <= ' ' }
-            ) {
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
 
+    //    private fun ExitElevator() {
+//        val destination: String = "arrivedDestination"
+//
+//        try {
+//            // Start the robot movement
+//
+//            // CODE FOR FLOOR DETECTION
+//
+//            printLog("current barcode: " + detectedBarcode)
+//            // Replace "goal floor" with text encoded in right floor QR code.
+//            if (detectedBarcode.equals("hello temi")){
+//                // Now on right floor
+//                printLog("On right floor!")
+//                arraylist.clear() // clear list of detected barcodes
+//
+//                // go to
 //                robot.goTo(
-//                    myLocation.lowercase().trim { it <= ' ' },
+//                    destination.lowercase().trim(),
 //                    backwards = false,
 //                    noBypass = false,
 //                    speedLevel = SpeedLevel.HIGH
 //                )
+//
+//                // Register the OnGoToLocationStatusChangedListener
+//                val goToLocationListener = object : OnGoToLocationStatusChangedListener { override fun onGoToLocationStatusChanged(
+//                    location: String,
+//                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+//                    descriptionId: Int,
+//                    description: String
+//                ) {
+//                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+//                        runOnUiThread {
+//                            printLog("\nSuccessfully arrived at $location")
+//                            // Voice Response - callback function
+//                            responseUponExit(location)
+//                        }
+//                    }
+//                }
+//                }
+//                robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+//            }
+//
+//
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            printLog(e.message ?: "")
+//        }
+//    }
+    private fun ExitElevator() {
+        val destination: String = "final_destination"
 
+        try {
 
-            } else {
-                runOnUiThread {
-                    printLog("\nLocation not found $myLocation")
+            if (detectedBarcode.equals("hello temi")) {
+                // Now on right floor
+                printLog("On right floor!")
+                arraylist.clear() // clear list of detected barcodes
+
+                // go to
+                // Start the robot movement
+                robot.goTo(
+                    destination.lowercase().trim(),
+                    backwards = false,
+                    noBypass = false,
+                    speedLevel = SpeedLevel.HIGH
+                )
+
+                // Register the OnGoToLocationStatusChangedListener
+                val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                    override fun onGoToLocationStatusChanged(
+                        location: String,
+                        @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                        descriptionId: Int,
+                        description: String
+                    ) {
+                        if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                            runOnUiThread {
+                                printLog("\nSuccessfully arrived at $location")
+                                // Voice Response - callback function
+                                responseUponExit(location)
+                            }
+                        }
+                    }
                 }
-            }
-        }
-        if (myLocation == "home base") {
-            runOnUiThread {
-                printLog("\nYou are home.  I'm going back to the main screen")
-            }
-        }
 
-        else if (myLocation == "ea3outpasselev") {
-            runOnUiThread {
-                robot.speak(create("Please push the elevator button for me!", false))
+                robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
         }
-        else {
-            var nextLoc = myLocations[sequenceNum + 1]
-            runOnUiThread {
-                printLog("\nPress button again to go to next location: $nextLoc")
-            }
-        }
-        sequenceNum++
     }
+
+
 
     /**
      * Modified version of loadMap function with dialog removed. ID is hardcoded in the onClick handler above.
@@ -1610,28 +1740,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         dialog.show()
     }
 
-    /**
-     * When adding the Nlp Listener to your project you need to implement this method
-     * which will listen for specific intents and allow you to respond accordingly.
-     *
-     * See AndroidManifest.xml for reference on adding each intent.
-     */
-    override fun onNlpCompleted(nlpResult: NlpResult) {
-        //do something with nlp result. Base the action specified in the AndroidManifest.xml
-        Toast.makeText(this@MainActivity, nlpResult.action, Toast.LENGTH_SHORT).show()
-        printLog("NlpCompleted: $nlpResult" )
-        when (nlpResult.action) {
-            ACTION_HOME_WELCOME -> robot.tiltAngle(23)
-            ACTION_HOME_DANCE -> {
-                val t = System.currentTimeMillis()
-                val end = t + 5000
-                while (System.currentTimeMillis() < end) {
-                    robot.skidJoy(0f, 1f)
-                }
-            }
-            ACTION_HOME_SLEEP -> robot.goTo(HOME_BASE_LOCATION)
-        }
-    }
+
 
     /**
      * callOwner is an example of how to use telepresence to call an individual.
@@ -2695,6 +2804,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         const val ACTION_HOME_DANCE = "home.dance"
         const val ACTION_HOME_SLEEP = "home.sleep"
         const val HOME_BASE_LOCATION = "home base"
+        const val ACTION_HOME_GOTOELEVATOR = "home.gotoelevator"
+        const val ACTION_HOME_GOINSIDEELEVATOR = "home.goinsideelevator"
+        const val ACTION_HOME_FINALDESTINATION = "home.finaldestination"
 
         // Storage Permissions
         private const val REQUEST_EXTERNAL_STORAGE = 1

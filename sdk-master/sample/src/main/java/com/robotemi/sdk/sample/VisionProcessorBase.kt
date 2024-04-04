@@ -37,6 +37,7 @@ import com.google.android.odml.image.ByteBufferMlImageBuilder
 import com.google.android.odml.image.MediaMlImageBuilder
 import com.google.android.odml.image.MlImage
 import com.google.mlkit.common.MlKitException
+import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.robotemi.sdk.sample.preference.PreferenceUtils
 //import com.google.mlkit.vision.demo.BitmapUtils
@@ -50,6 +51,7 @@ import com.robotemi.sdk.sample.preference.PreferenceUtils
 import java.lang.Math.max
 import java.lang.Math.min
 import java.nio.ByteBuffer
+import java.util.ArrayList
 import java.util.Timer
 import java.util.TimerTask
 
@@ -109,7 +111,7 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
   }
 
   // -----------------Code for processing single still image----------------------------------------
-  override fun processBitmap(bitmap: Bitmap?, graphicOverlay: GraphicOverlay) {
+  override fun processBitmap(bitmap: Bitmap?, graphicOverlay: GraphicOverlay, arraylist: ArrayList<Barcode>) {
     val frameStartMs = SystemClock.elapsedRealtime()
 
     if (isMlImageEnabled(graphicOverlay.context)) {
@@ -119,7 +121,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         graphicOverlay,
         /* originalCameraImage= */ null,
         /* shouldShowFps= */ false,
-        frameStartMs
+        frameStartMs,
+        arraylist
       )
       mlImage.close()
       return
@@ -130,7 +133,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
       graphicOverlay,
       /* originalCameraImage= */ null,
       /* shouldShowFps= */ false,
-      frameStartMs
+      frameStartMs,
+      arraylist
     )
   }
 
@@ -139,30 +143,32 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
   override fun processByteBuffer(
     data: ByteBuffer?,
     frameMetadata: FrameMetadata?,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
+    arraylist: ArrayList<Barcode>
   ) {
     latestImage = data
     latestImageMetaData = frameMetadata
     if (processingImage == null && processingMetaData == null) {
-      processLatestImage(graphicOverlay)
+      processLatestImage(graphicOverlay, arraylist)
     }
   }
 
   @Synchronized
-  private fun processLatestImage(graphicOverlay: GraphicOverlay) {
+  private fun processLatestImage(graphicOverlay: GraphicOverlay, arraylist: ArrayList<Barcode>) {
     processingImage = latestImage
     processingMetaData = latestImageMetaData
     latestImage = null
     latestImageMetaData = null
     if (processingImage != null && processingMetaData != null && !isShutdown) {
-      processImage(processingImage!!, processingMetaData!!, graphicOverlay)
+      processImage(processingImage!!, processingMetaData!!, graphicOverlay, arraylist)
     }
   }
 
   private fun processImage(
     data: ByteBuffer,
     frameMetadata: FrameMetadata,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
+    arraylist: ArrayList<Barcode>
   ) {
     val frameStartMs = SystemClock.elapsedRealtime()
     // If live viewport is on (that is the underneath surface view takes care of the camera preview
@@ -181,8 +187,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
           )
           .setRotation(frameMetadata.rotation)
           .build()
-      requestDetectInImage(mlImage, graphicOverlay, bitmap, /* shouldShowFps= */ true, frameStartMs)
-        .addOnSuccessListener(executor) { processLatestImage(graphicOverlay) }
+      requestDetectInImage(mlImage, graphicOverlay, bitmap, /* shouldShowFps= */ true, frameStartMs, arraylist)
+        .addOnSuccessListener(executor) { processLatestImage(graphicOverlay, arraylist) }
 
       // This is optional. Java Garbage collection can also close it eventually.
       mlImage.close()
@@ -195,20 +201,21 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         frameMetadata.width,
         frameMetadata.height,
         frameMetadata.rotation,
-        InputImage.IMAGE_FORMAT_NV21
+        InputImage.IMAGE_FORMAT_NV21,
       ),
       graphicOverlay,
       bitmap,
       /* shouldShowFps= */ true,
-      frameStartMs
+      frameStartMs,
+      arraylist
     )
-      .addOnSuccessListener(executor) { processLatestImage(graphicOverlay) }
+      .addOnSuccessListener(executor) { processLatestImage(graphicOverlay, arraylist) }
   }
 
   // -----------------Code for processing live preview frame from CameraX API-----------------------
   @RequiresApi(VERSION_CODES.LOLLIPOP)
   @ExperimentalGetImage
-  override fun processImageProxy(image: ImageProxy, graphicOverlay: GraphicOverlay) {
+  override fun processImageProxy(image: ImageProxy, graphicOverlay: GraphicOverlay, arraylist: ArrayList<Barcode>) {
     val frameStartMs = SystemClock.elapsedRealtime()
     if (isShutdown) {
       return
@@ -226,7 +233,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
         graphicOverlay,
         /* originalCameraImage= */ bitmap,
         /* shouldShowFps= */ true,
-        frameStartMs
+        frameStartMs,
+        arraylist
       )
         // When the image is from CameraX analysis use case, must call image.close() on received
         // images when finished using them. Otherwise, new images may not be received or the camera
@@ -243,7 +251,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
       graphicOverlay,
       /* originalCameraImage= */ bitmap,
       /* shouldShowFps= */ true,
-      frameStartMs
+      frameStartMs,
+      arraylist
     )
       // When the image is from CameraX analysis use case, must call image.close() on received
       // images when finished using them. Otherwise, new images may not be received or the camera
@@ -257,14 +266,16 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     graphicOverlay: GraphicOverlay,
     originalCameraImage: Bitmap?,
     shouldShowFps: Boolean,
-    frameStartMs: Long
+    frameStartMs: Long,
+    arraylist: ArrayList<Barcode>
   ): Task<T> {
     return setUpListener(
       detectInImage(image),
       graphicOverlay,
       originalCameraImage,
       shouldShowFps,
-      frameStartMs
+      frameStartMs,
+      arraylist
     )
   }
 
@@ -273,14 +284,16 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     graphicOverlay: GraphicOverlay,
     originalCameraImage: Bitmap?,
     shouldShowFps: Boolean,
-    frameStartMs: Long
+    frameStartMs: Long,
+    arraylist: ArrayList<Barcode>
   ): Task<T> {
     return setUpListener(
       detectInImage(image),
       graphicOverlay,
       originalCameraImage,
       shouldShowFps,
-      frameStartMs
+      frameStartMs,
+      arraylist
     )
   }
 
@@ -289,7 +302,8 @@ abstract class VisionProcessorBase<T>(context: Context) : VisionImageProcessor {
     graphicOverlay: GraphicOverlay,
     originalCameraImage: Bitmap?,
     shouldShowFps: Boolean,
-    frameStartMs: Long
+    frameStartMs: Long,
+    arraylist: ArrayList<Barcode>
   ): Task<T> {
     val detectorStartMs = SystemClock.elapsedRealtime()
     return task

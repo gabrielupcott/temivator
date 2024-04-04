@@ -43,8 +43,10 @@
             android:name="com.robotemi.sdk.metadata.ACTIONS"
             android:value="home.welcome,
                            home.dance,
-                           home.sleep" />
-
+                           home.sleep,
+                           home.gotoelevator,
+                           home.goinsideelevator,
+                           home.finaldestination" />
         <meta-data
             android:name="com.robotemi.sdk.metadata.KIOSK"
             android:value="true" />

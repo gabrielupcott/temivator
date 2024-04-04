@@ -51,47 +51,44 @@
         android:text="Change Speed: High" />
 
     <Button
-        android:id="@+id/btnWillsTestButton"
-        style="@style/ButtonCommon"
-        android:layout_width="325dp"
-        android:layout_height="wrap_content"
-        android:text="Will's Test Button" />
-
-    <Button
         android:id="@+id/btnImageProcessing"
         style="@style/ButtonCommon"
         android:layout_width="325dp"
         android:layout_height="wrap_content"
         android:text="Image Processing" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <Button
+        android:id="@+id/btnPrintBarcodes"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Print Barcodes" />
+    <Button
+        android:id="@+id/GoToElevatorButton"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Go To Elevator" />
 
-        <com.robotemi.sdk.sample.CameraSourcePreview
-            android:id="@+id/preview_view"
-            android:layout_width="225dp"
-            android:layout_height="276dp"
-            android:layout_marginStart="527dp"
-            android:layout_marginEnd="528dp"
-            android:layout_marginBottom="44dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/graphic_overlay" />
+    <Button
+        android:id="@+id/GoInsideElevatorButton"
+        style="@style/ButtonCommon"
+        android:layout_height="wrap_content"
+        android:layout_width="325dp"
+        android:text="Go inside elevator" />
 
-        <com.robotemi.sdk.sample.GraphicOverlay
-            android:id="@+id/graphic_overlay"
-            android:layout_width="225dp"
-            android:layout_height="276dp"
-            android:layout_marginStart="527dp"
-            android:layout_marginEnd="528dp"
-            android:layout_marginBottom="44dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <Button
+        android:id="@+id/ExitElevator"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Exit Elevator" />
 
+    <Button
+        android:id="@+id/listenerButton"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Listener Button" />
 
 </LinearLayout>
