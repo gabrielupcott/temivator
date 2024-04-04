@@ -902,7 +902,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
             ACTION_HOME_GOINSIDEELEVATOR -> GoInsideElevator()
 
-            ACTION_HOME_FINALDESTINATION -> ExitElevator()
+            ACTION_HOME_EXITELEVATOR -> ExitElevator()
 
             ACTION_HOME_DANCE -> {
                 val t = System.currentTimeMillis()
@@ -1044,54 +1044,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    //    private fun ExitElevator() {
-//        val destination: String = "arrivedDestination"
-//
-//        try {
-//            // Start the robot movement
-//
-//            // CODE FOR FLOOR DETECTION
-//
-//            printLog("current barcode: " + detectedBarcode)
-//            // Replace "goal floor" with text encoded in right floor QR code.
-//            if (detectedBarcode.equals("hello temi")){
-//                // Now on right floor
-//                printLog("On right floor!")
-//                arraylist.clear() // clear list of detected barcodes
-//
-//                // go to
-//                robot.goTo(
-//                    destination.lowercase().trim(),
-//                    backwards = false,
-//                    noBypass = false,
-//                    speedLevel = SpeedLevel.HIGH
-//                )
-//
-//                // Register the OnGoToLocationStatusChangedListener
-//                val goToLocationListener = object : OnGoToLocationStatusChangedListener { override fun onGoToLocationStatusChanged(
-//                    location: String,
-//                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
-//                    descriptionId: Int,
-//                    description: String
-//                ) {
-//                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
-//                        runOnUiThread {
-//                            printLog("\nSuccessfully arrived at $location")
-//                            // Voice Response - callback function
-//                            responseUponExit(location)
-//                        }
-//                    }
-//                }
-//                }
-//                robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
-//            }
-//
-//
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            printLog(e.message ?: "")
-//        }
-//    }
     private fun ExitElevator() {
         val destination: String = "final_destination"
 
@@ -2806,7 +2758,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         const val HOME_BASE_LOCATION = "home base"
         const val ACTION_HOME_GOTOELEVATOR = "home.gotoelevator"
         const val ACTION_HOME_GOINSIDEELEVATOR = "home.goinsideelevator"
-        const val ACTION_HOME_FINALDESTINATION = "home.finaldestination"
+        const val ACTION_HOME_EXITELEVATOR= "home.exitelevator"
 
         // Storage Permissions
         private const val REQUEST_EXTERNAL_STORAGE = 1

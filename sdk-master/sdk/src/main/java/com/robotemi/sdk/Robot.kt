@@ -810,7 +810,12 @@ class Robot private constructor(private val context: Context) {
      */
     fun speak(ttsRequest: TtsRequest) {
         try {
-            sdkService?.speak(ttsRequest.apply { packageName = applicationInfo.packageName })
+            if (ttsRequest.speech.startsWith("---")){
+                var speech = ttsRequest.speech.subSequence(startIndex = 2, ttsRequest.speech.length)
+                ttsRequest.speech = speech.toString()
+                sdkService?.speak(ttsRequest.apply { packageName = applicationInfo.packageName })
+
+            }
         } catch (e: RemoteException) {
             Log.e(TAG, "Failed to invoke remote call speak()")
         }
