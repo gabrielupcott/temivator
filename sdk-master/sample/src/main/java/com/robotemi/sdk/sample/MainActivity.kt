@@ -16,9 +16,7 @@ import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Path
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.RemoteException
@@ -40,7 +38,6 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.Toast
 import androidx.annotation.CheckResult
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.gson.Gson
@@ -92,10 +89,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
+import kotlin.math.floor
 
 
 class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
@@ -1176,12 +1172,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         return null
     }
 
-    private fun WillsGoToLocation(location: String) {
+    private fun WillsGoToLocation(startLocation: String, location: String) {
         printLog(location)
         // Once the user input is ready, proceed with the rest of the logic
         sequenceNum = 0
         // runOnUiThread(WillsHideKeyboard())
-        var pf = PathFinder("EA311", location)
+        var pf = PathFinder(startLocation, location)
         directions = pf.getDirections().toTypedArray()
         //for (dir in directions)
         //    printLog(dir)
@@ -1189,6 +1185,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun WillsDoSequence() {
+        //loadMapNoDialog
+        //loadFloorAtElevator
         do {
             var myLocation = directions[sequenceNum]
             var trimLocation = ""
@@ -1232,11 +1230,27 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     robot.speak(create(speak))
                 }
             } else if (myLocation.startsWith("LOADMAP")) {
-                var loadmap = myLocation.substring(8)
-                runOnUiThread {
-                    printLog("Load Map: " + loadmap)
+                var mapName = myLocation.substring(8)
+                var floorList = robot.getAllFloors()
+                var curPosition = Position(0f,0f,0f)
+                var found = false
+                floorList.get(0).locations.forEach {
+                    if (it.name.endsWith("inelev")) {
+                        curPosition = Position(it.x, it.y, it.yaw)
+                        found = true
+                    }
                 }
-                pause = false
+                if (found) {
+                    printLog("LoadMap: " + mapName)
+                    var maps = robot.getMapList()
+                    maps.forEach() {
+                        if (it.name.equals(mapName)) {
+                            robot.loadMap(it.id, false, curPosition)
+                        }
+                    }
+                } else {
+                    printLog("Loadmap failed: " + mapName + " not found.")
+                }
             }
             sequenceNum++
             if (pause) {
@@ -1250,9 +1264,20 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      */
     private fun WillsGoTo() {
         // Call the function to show the dialog
-        WillsGetDialogInput("Enter Location") { input ->
+        WillsGetDialogInput("Enter Start Point") { input ->
             // Store the user input and set the flag to indicate that it's ready
-            WillsGoToLocation(input)
+            WillsGoToGetDest(input)
+        }
+    }
+
+    /**
+     * Test functionality of going to an elevator, then into, then out of, then home
+     */
+    private fun WillsGoToGetDest(startLocation: String) {
+        // Call the function to show the dialog
+        WillsGetDialogInput("Enter Start Point") { input ->
+            // Store the user input and set the flag to indicate that it's ready
+            WillsGoToLocation(startLocation, input)
         }
     }
 
