@@ -1167,11 +1167,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    private fun WillsHideKeyboard(): Runnable? {
-        hideKeyboard()
-        return null
-    }
-
     private fun WillsGoToLocation(startLocation: String, location: String) {
         printLog(location)
         // Once the user input is ready, proceed with the rest of the logic
@@ -1212,12 +1207,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     }
                 }
                 if (locationFound) {
-//            robot.goTo(
-//                trimLocation,
-//                backwards = false,
-//                noBypass = false,
-//                speedLevel = SpeedLevel.HIGH
-//            )
+                    robot.goTo(
+                        trimLocation,
+                        backwards = false,
+                        noBypass = false,
+                        speedLevel = SpeedLevel.HIGH
+                    )
                 } else {
                     runOnUiThread {
                         printLog("Location not found $myLocation")
@@ -1235,18 +1230,22 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 var curPosition = Position(0f,0f,0f)
                 var found = false
                 floorList.get(0).locations.forEach {
-                    if (it.name.endsWith("inelev")) {
+                    if (it.name.endsWith("inpasselev")) {
                         curPosition = Position(it.x, it.y, it.yaw)
                         found = true
                     }
                 }
+                var mapId = ""
                 if (found) {
                     printLog("LoadMap: " + mapName)
                     var maps = robot.getMapList()
                     maps.forEach() {
                         if (it.name.equals(mapName)) {
-                            robot.loadMap(it.id, false, curPosition)
+                            mapId = it.id
                         }
+                    }
+                    if (mapId != "") {
+                        robot.loadMap(mapId, false, curPosition)
                     }
                 } else {
                     printLog("Loadmap failed: " + mapName + " not found.")
@@ -1264,7 +1263,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      */
     private fun WillsGoTo() {
         // Call the function to show the dialog
-        WillsGetDialogInput("Enter Start Point") { input ->
+        WillsGetDialogInput("Enter Start Room") { input ->
             // Store the user input and set the flag to indicate that it's ready
             WillsGoToGetDest(input)
         }
@@ -1275,7 +1274,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      */
     private fun WillsGoToGetDest(startLocation: String) {
         // Call the function to show the dialog
-        WillsGetDialogInput("Enter Start Point") { input ->
+        WillsGetDialogInput("Enter Destination Room") { input ->
             // Store the user input and set the flag to indicate that it's ready
             WillsGoToLocation(startLocation, input)
         }
