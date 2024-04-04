@@ -673,7 +673,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
-        //listenerButton.setOnClickListener { STT() } //listener button
+
         ExitElevator.setOnClickListener { ExitElevator() } //new method
         GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
         GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
@@ -713,9 +713,39 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      */
 
 
+    /**
+     * When adding the Nlp Listener to your project you need to implement this method
+     * which will listen for specific intents and allow you to respond accordingly.
+     *
+     * https://github.com/robotemi/sdk/issues/24 --- going to this link will save you 4 weeks of work
+     *
+     * See AndroidManifest.xml for reference on adding each intent.
+     */
+    override fun onNlpCompleted(nlpResult: NlpResult) {
+        //do something with nlp result. Base the action specified in the AndroidManifest.xml
+
+        printLog("NlpCompleted: $nlpResult" )
 
 
+        when (nlpResult.action) {
+            ACTION_HOME_WELCOME -> robot.tiltAngle(23)
 
+            ACTION_HOME_GOTOELEVATOR -> GoToElevator()
+
+            ACTION_HOME_GOINSIDEELEVATOR -> GoInsideElevator()
+
+            ACTION_HOME_FINALDESTINATION -> ExitElevator()
+
+            ACTION_HOME_DANCE -> {
+                val t = System.currentTimeMillis()
+                val end = t + 5000
+                while (System.currentTimeMillis() < end) {
+                    robot.skidJoy(0f, 1f)
+                }
+            }
+            ACTION_HOME_SLEEP -> robot.goTo(HOME_BASE_LOCATION)
+        }
+    }
 
 
     /**
@@ -760,32 +790,17 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * What to speak outside the elevator ( essentially the arrive method )
      */
     private fun responseUponExit(destination : String) {
-        robot.speak(create("---Arrived at cyber security room",false))
+        robot.speak(create("---Arrived at destination",false))
         //Get an answer from the user - listen to response
 
     }
-
-    /**
-     * Go to a specified location
-     * @param destination The location to go to
-     */
-    private fun goToLocation(destination: String) {
-        //error message
-
-    }
-
-
-    private fun ListenerButton() {
-        //Todo
-    }
-
 
 
 
 
 
     private fun GoToElevator() {
-        val destination: String = "Infrontelevator"
+        val destination: String = "outside_elevator"
 
         try {
             // Start the robot movement
@@ -806,7 +821,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 ) {
                     if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
                         runOnUiThread {
-                            printLog("\nSuccessfully arrived at $location Gabe")
+                            printLog("\nSuccessfully arrived at destination")
                             // Voice Response
                             responseAtElevator()
                         }
@@ -826,7 +841,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
     private fun GoInsideElevator() {
-        val destination: String = "inside_elevator"
+        val destination: String = "elevator"
 
         try {
             // Start the robot movement
@@ -863,7 +878,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun ExitElevator() {
-        val destination: String = "arrivedDestination"
+        val destination: String = "final_destination"
 
         try {
             // Start the robot movement
@@ -1565,28 +1580,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         dialog.show()
     }
 
-    /**
-     * When adding the Nlp Listener to your project you need to implement this method
-     * which will listen for specific intents and allow you to respond accordingly.
-     *
-     * See AndroidManifest.xml for reference on adding each intent.
-     */
-    override fun onNlpCompleted(nlpResult: NlpResult) {
-        //do something with nlp result. Base the action specified in the AndroidManifest.xml
-        Toast.makeText(this@MainActivity, nlpResult.action, Toast.LENGTH_SHORT).show()
-        printLog("NlpCompleted: $nlpResult" )
-        when (nlpResult.action) {
-            ACTION_HOME_WELCOME -> robot.tiltAngle(23)
-            ACTION_HOME_DANCE -> {
-                val t = System.currentTimeMillis()
-                val end = t + 5000
-                while (System.currentTimeMillis() < end) {
-                    robot.skidJoy(0f, 1f)
-                }
-            }
-            ACTION_HOME_SLEEP -> robot.goTo(HOME_BASE_LOCATION)
-        }
-    }
+
 
     /**
      * callOwner is an example of how to use telepresence to call an individual.
@@ -2645,6 +2639,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         const val ACTION_HOME_DANCE = "home.dance"
         const val ACTION_HOME_SLEEP = "home.sleep"
         const val HOME_BASE_LOCATION = "home base"
+        const val ACTION_HOME_GOTOELEVATOR = "home.gotoelevator"
+        const val ACTION_HOME_GOINSIDEELEVATOR = "home.goinsideelevator"
+        const val ACTION_HOME_FINALDESTINATION = "home.finaldestination"
+
 
         // Storage Permissions
         private const val REQUEST_EXTERNAL_STORAGE = 1
