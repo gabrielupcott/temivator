@@ -43,7 +43,7 @@
                            home.sleep,
                            home.gotoelevator,
                            home.goinsideelevator,
-                           home.finaldestination" />
+                           home.exitelevator" />
 
         <meta-data
             android:name="com.robotemi.sdk.metadata.KIOSK"

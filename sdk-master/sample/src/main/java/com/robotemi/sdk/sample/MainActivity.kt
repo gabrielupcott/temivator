@@ -686,7 +686,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
         btnChangeSpeed.setOnClickListener { setSpeed() }
-        btnWillsTestButton.setOnClickListener { WillsGoTo() }
+
     }
 
                                             //    reposeRequired: Boolean,
@@ -734,7 +734,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
             ACTION_HOME_GOINSIDEELEVATOR -> GoInsideElevator()
 
-            ACTION_HOME_FINALDESTINATION -> ExitElevator()
+            ACTION_HOME_EXITELEVATOR -> ExitElevator()
 
             ACTION_HOME_DANCE -> {
                 val t = System.currentTimeMillis()
@@ -914,70 +914,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    /**
-     * Test functionality of going to an elevator, then into, then out of, then home
-     */
-    private fun WillsGoTo() {
-        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
-        var myLocation = myLocations[sequenceNum]
-        //error message
-        runOnUiThread {
-            printLog("\nTrying to go to location: $myLocation")
-        }
-
-        for (location in robot.locations) {
-
-            if(myLocation == "ea3outpasselev") {
-                runOnUiThread {
-                    printLog("\n\n working \n\n")
-                    robot.speak(create("---Going to elevator" , false, cached = true))
-                }
-            }
-
-            if(myLocation == "ea3inpasselev") {
-                runOnUiThread {
-                    printLog("\n\n working \n\n")
-                    robot.speak(create("---Please open the elevator" , false, cached = true))
-                }
-            }
-
-            if (location.lowercase() == myLocation.lowercase()
-                    .trim { it <= ' ' }
-            ) {
-
-                robot.goTo(
-                    myLocation.lowercase().trim { it <= ' ' },
-                    backwards = false,
-                    noBypass = false,
-                    speedLevel = SpeedLevel.HIGH
-                )
-
-
-            } else {
-                runOnUiThread {
-                    printLog("\nLocation not found $myLocation")
-                }
-            }
-        }
-        if (myLocation == "home base") {
-            runOnUiThread {
-                printLog("\nYou are home.  I'm going back to the main screen")
-            }
-        }
-
-        else if (myLocation == "ea3inpasselev") {
-            runOnUiThread {
-                robot.speak(create("---Please push the elevator button for me!", false))
-            }
-        }
-        else {
-            var nextLoc = myLocations[sequenceNum + 1]
-            runOnUiThread {
-                printLog("\nPress button again to go to next location: $nextLoc")
-            }
-        }
-        sequenceNum++
-    }
 
     /**
      * Modified version of loadMap function with dialog removed. ID is hardcoded in the onClick handler above.
@@ -2641,7 +2577,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         const val HOME_BASE_LOCATION = "home base"
         const val ACTION_HOME_GOTOELEVATOR = "home.gotoelevator"
         const val ACTION_HOME_GOINSIDEELEVATOR = "home.goinsideelevator"
-        const val ACTION_HOME_FINALDESTINATION = "home.finaldestination"
+        const val ACTION_HOME_EXITELEVATOR = "home.exitelevator"
 
 
         // Storage Permissions
