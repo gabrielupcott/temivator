@@ -8,19 +8,19 @@ import java.util.Map;
 
 public class PathFinder {
     public List<String> directions = new ArrayList<>();
-    String[] floorList = new String[] {"EA0", "EA1", "EA2", "EA3", "EA4", "E0", "E1", "E2", "E3"};
-    String[] wings = new String[] {"E", "EA"};
+    String[] floorList = new String[] {"ea0", "ea1", "ea2", "ea3", "ea4", "e0", "e1", "e2", "e3"};
+    String[] wings = new String[] {"e", "ea"};
     int[] numFloors = new int[] {4, 5};
     String[][] floorPaths = new String[][] {
-            {"EA1", "EA2", "EA3", "EA4", "E0"},
-            {"EA0", "EA2", "EA3", "EA4", "E1"},
-            {"EA0", "EA1", "EA3", "EA4", "E2"},
-            {"EA0", "EA1", "EA2", "EA4", "E3"},
-            {"EA0", "EA1", "EA2", "EA3"},
-            {"E1", "E2", "E3", "EA0"},
-            {"E0", "E2", "E3", "EA1"},
-            {"E0", "E1", "E3", "EA2"},
-            {"E0", "E1", "E2", "EA3"},
+            {"ea1", "ea2", "ea3", "ea4", "e0"},
+            {"ea0", "ea2", "ea3", "ea4", "e1"},
+            {"ea0", "ea1", "ea3", "ea4", "e2"},
+            {"ea0", "ea1", "ea2", "ea4", "e3"},
+            {"ea0", "ea1", "ea2", "ea3"},
+            {"e1", "e2", "e3", "ea0"},
+            {"e0", "e2", "e3", "ea1"},
+            {"e0", "e1", "e3", "ea2"},
+            {"e0", "e1", "e2", "ea3"},
     };
 
     String[] from;
@@ -37,7 +37,7 @@ public class PathFinder {
             if (!pathFrom[0].equals(pathTo[0])) { // Same floor different wing
                 decodedDirections.add(String.format("GOTO %s%sto%s%s",
                         pathFrom[0], pathFrom[1], pathTo[0], pathTo[1]));
-                decodedDirections.add(String.format("LOADMAP %s%s",
+                decodedDirections.add(String.format("LOADMAP will%s%s",
                         pathTo[0], pathTo[1]));
             } else { // Same wing different floor
                 decodedDirections.add(String.format("GOTO %s%soutpasselev",
@@ -48,7 +48,7 @@ public class PathFinder {
                         pathFrom[0], pathFrom[1]));
                 decodedDirections.add(String.format("SPEAK Push the button to go to floor %s",
                         pathTo[1]));
-                decodedDirections.add(String.format("LOADMAP %s%s",
+                decodedDirections.add(String.format("LOADMAP will%s%s",
                         pathTo[0], pathTo[1]));
                 decodedDirections.add("SPEAK When the doors open, please hold the doors open for me");
                 decodedDirections.add(String.format("GOTO %s%sexitpasselev",
