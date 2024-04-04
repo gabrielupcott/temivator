@@ -45,7 +45,7 @@ import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.createBitmap
+//import androidx.core.graphics.createBitmap
 import com.google.gson.Gson
 import com.google.mlkit.vision.barcode.ZoomSuggestionOptions
 import com.robotemi.sdk.*
