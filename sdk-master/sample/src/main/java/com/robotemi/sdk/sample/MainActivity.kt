@@ -148,7 +148,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         robot.addOnSdkExceptionListener(this)
         robot.addOnMovementStatusChangedListener(this)
         robot.addOnGreetModeStateChangedListener(this)
+        robot.addWakeupWordListener(this)
         robot.addOnLoadFloorStatusChangedListener(this)
+        robot.addAsrListener(this)
         robot.addOnTelepresenceStatusChangedListener(telepresenceStatusChangedListener)
         val appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
         if (appInfo.metaData != null
@@ -671,7 +673,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
-        listenerButton.setOnClickListener { ListenerButton() } //listener button
+        //listenerButton.setOnClickListener { STT() } //listener button
         ExitElevator.setOnClickListener { ExitElevator() } //new method
         GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
         GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
@@ -709,6 +711,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      *
      *
      */
+
+
+
+
+
+
 
     /**
      * This is where the onClick functions for the Elevator tab buttons are
@@ -1647,6 +1655,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     override fun onWakeupWord(wakeupWord: String, direction: Int) {
         // Do anything on wakeup. Follow, go to location, or even try creating dance moves.
         printLog("onWakeupWord", "$wakeupWord, $direction")
+
     }
 
     override fun onTtsStatusChanged(ttsRequest: TtsRequest) {
@@ -1763,7 +1772,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             asrResult.equals("Hello", ignoreCase = true) -> {
                 robot.askQuestion("Hello, I'm temi, what can I do for you?")
             }
-            asrResult.equals("Go to elevator", ignoreCase = true) -> {
+            asrResult.equals("---Go to elevator", ignoreCase = true) -> {
                 GoToElevator()
             }
 

@@ -5,6 +5,16 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
+     <meta-data android:name="com.robotemi.sdk.metadata.KIOSK" android:value="true">
+
+     </meta-data>
+
+     <meta-data android:name="com.robotemi.sdk.metadata.OVERRIDE_NLU" android:value="true">
+
+     </meta-data>
+
+
     <!--  Use this permission on receiver to get the event when voice assistant is changed  -->
     <uses-permission android:name="com.robotemi.permission.ASSISTANT"/>
 
