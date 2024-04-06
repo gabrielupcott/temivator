@@ -750,11 +750,11 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private var selectedModel = "Barcode Scanner"
     private var detectedBarcode = "";
     private var arraylist = ArrayList<String>()
+    private var zoomCallback: ZoomSuggestionOptions.ZoomCallback? = null
+    private var barcodeScannerProcessor: BarcodeScannerProcessor? = null
 
     private fun printBarcodes(){
-        printLog("barcodes: ")
-        printLog("barcode: " + detectedBarcode)
-
+        barcodeScannerProcessor?.let { printLog("barcode: " +it.detectedBarcode) }
     }
 
     private fun allRuntimePermissionsGranted(): Boolean {
@@ -814,10 +814,11 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     //private val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
     private var processor: BarcodeScannerProcessor? = null
 
-    private fun createCameraSource(model: String): BarcodeScannerProcessor {
+    private fun createCameraSource(model: String): BarcodeScannerProcessor? {
         // If there's no existing cameraSource, create one.
         if (cameraSource == null) {
             cameraSource = CameraSource(this, graphicOverlay)
+            barcodeScannerProcessor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
         }
         try {
 //            when (model) {
@@ -843,9 +844,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     if (PreferenceUtils.shouldEnableAutoZoom(this)) {
                         zoomCallback = ZoomCallback { zoomLevel: Float -> cameraSource!!.setZoom(zoomLevel) }
                     }
-                    processor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
+                    processor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode = detectedBarcode)
                     cameraSource!!.setMachineLearningFrameProcessor(
-                        BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
+                        barcodeScannerProcessor
                     )
                 }
             }
@@ -861,8 +862,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         Log.e(TAG, "hello")
         val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
 //        return ObjectDetectorProcessor(this, objectDetectorOptions)
-        var zoomCallback: ZoomSuggestionOptions.ZoomCallback? = null
-        return BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
+        if (PreferenceUtils.shouldEnableAutoZoom(this)) {
+            zoomCallback = ZoomCallback { zoomLevel: Float -> cameraSource!!.setZoom(zoomLevel) }
+        }
+        return barcodeScannerProcessor
     }
 
     /**
@@ -967,6 +970,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun GoToElevator() {
+        if (cameraSource == null){
+            startImageProcessing()
+        }
         val destination: String = "outside_elevator"
 
         try {
@@ -1049,7 +1055,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         try {
 
-            if (detectedBarcode.equals("hello temi")) {
+            if (barcodeScannerProcessor?.detectedBarcode?.equals("hello temi") == true
+            ) {
                 // Now on right floor
                 printLog("On right floor!")
                 arraylist.clear() // clear list of detected barcodes
@@ -1082,7 +1089,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 }
 
                 robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+                barcodeScannerProcessor?.detectedBarcode = ""
             }
+            else if (barcodeScannerProcessor?.detectedBarcode?.equals("") == true){
+                printLog("No Barcode Detected!")
+            }
+            else printLog("Wrong Barcode Detected!")
         } catch (e: Exception) {
             e.printStackTrace()
             printLog(e.message ?: "")
