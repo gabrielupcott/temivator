@@ -30,10 +30,11 @@ import com.robotemi.sdk.sample.GraphicOverlay
 import com.robotemi.sdk.sample.VisionProcessorBase
 
 /** Barcode Detector Demo. */
-class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, var detectedBarcode: String) :
+class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, detectedBarcode: String) :
   VisionProcessorBase<List<Barcode>>(context) {
 
   private var barcodeScanner: BarcodeScanner
+  public var detectedBarcode = ""
 
   init {
     // Note that if you know which format of barcode your app is dealing with, detection will be
@@ -57,6 +58,10 @@ class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, var
     super.stop()
     barcodeScanner.close()
   }
+
+//  fun getDetectedBarcode(): String {
+//    return detectedBarcode
+//  }
 
   override fun detectInImage(image: InputImage): Task<List<Barcode>> {
     return barcodeScanner.process(image)
