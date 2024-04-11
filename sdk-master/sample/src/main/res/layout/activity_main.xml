@@ -13,199 +13,6 @@
     tools:context=".MainActivity"
     tools:ignore="HardcodedText">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <EditText
-                android:id="@+id/etSaveLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="center_horizontal"
-                android:hint="@string/enter_location"
-                android:inputType="textPersonName"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorGrey" />
-
-            <Button
-                android:id="@+id/btnSaveLocation"
-                style="@style/ButtonCommon"
-                android:text="@string/save_location" />
-
-            <EditText
-                android:id="@+id/etGoTo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:ems="10"
-                android:gravity="center_horizontal"
-                android:hint="@string/go_to_location"
-                android:inputType="textPersonName"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorGrey" />
-
-            <Button
-                android:id="@+id/btnGoTo"
-                style="@style/ButtonCommon"
-                android:text="@string/go_to" />
-
-            <EditText
-                android:id="@+id/etSpeak"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:ems="10"
-                android:gravity="center_horizontal"
-                android:hint="@string/enter_speech"
-                android:inputType="textPersonName"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorGrey" />
-
-            <Button
-                android:id="@+id/btnSpeak"
-                style="@style/ButtonCommon"
-                android:text="@string/speak" />
-
-            <EditText
-                android:id="@+id/etDistance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:ems="10"
-                android:gravity="center_horizontal"
-                android:hint="Please enter the distance"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorGrey" />
-
-            <Button
-                android:id="@+id/btnStartDetectionModeWithDistance"
-                style="@style/ButtonCommon"
-                android:text="Start Detection Mode with Distance" />
-
-            <EditText
-                android:id="@+id/etNlu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center_horizontal"
-                android:hint="@string/enter_speech"
-                android:inputType="text"
-                android:textColor="@color/colorWhite"
-                android:textColorHint="@color/colorGrey" />
-
-            <Button
-                android:id="@+id/btnNlu"
-                style="@style/ButtonCommon"
-                android:text="Start NLU" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="50dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="50dp"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/etX"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:hint="x"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="@color/colorGrey" />
-
-                <EditText
-                    android:id="@+id/etY"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:hint="y"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="@color/colorGrey" />
-
-                <EditText
-                    android:id="@+id/etYaw"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:hint="yaw"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/colorWhite"
-                    android:textColorHint="@color/colorGrey" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnGoToPosition"
-                style="@style/ButtonCommon"
-                android:text="Go To Position" />
-
-            <TextView
-                android:id="@+id/tvDetectionState"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:lines="1"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                tools:text="DetectionState" />
-
-            <TextView
-                android:id="@+id/tvDetection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:lines="1"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                tools:text="DetectionView" />
-
-            <TextView
-                android:id="@+id/tvGreetMode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:lines="1"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                tools:text="GreetModeView" />
-
-            <TextView
-                android:id="@+id/tvPosition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:lines="1"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                tools:text="PositionView" />
-
-            <TextView
-                android:id="@+id/tvDistance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:textColor="@color/colorWhite"
-                android:textSize="16sp"
-                tools:text="DistanceView" />
-
-        </LinearLayout>
-    </ScrollView>
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -306,28 +113,28 @@
 
         <com.robotemi.sdk.sample.CameraSourcePreview
             android:id="@+id/preview_view2"
-            android:layout_width="298dp"
-            android:layout_height="419dp"
+            android:layout_width="269dp"
+            android:layout_height="84dp"
             android:layout_above="@+id/btnClearLog"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="11dp"
             android:layout_marginEnd="50dp"
-            android:layout_marginBottom="252dp"
+            android:layout_marginBottom="194dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <com.robotemi.sdk.sample.GraphicOverlay
             android:id="@+id/graphic_overlay3"
-            android:layout_width="300dp"
-            android:layout_height="417dp"
+            android:layout_width="304dp"
+            android:layout_height="82dp"
             android:layout_above="@+id/btnClearLog"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="13dp"
             android:layout_marginEnd="50dp"
-            android:layout_marginBottom="252dp"
+            android:layout_marginBottom="198dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

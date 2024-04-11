@@ -176,8 +176,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
         val greetModeState = intent.extras?.getInt(SdkConstants.INTENT_ACTION_GREET_MODE_STATE)
         if (greetModeState != null) {
-            tvGreetMode.text =
-                "Greet Mode -> ${OnGreetModeStateChangedListener.State.fromValue(greetModeState)}"
         }
         debugReceiver = TemiBroadcastReceiver()
         registerReceiver(debugReceiver, IntentFilter(TemiBroadcastReceiver.ACTION_DEBUG))
@@ -372,19 +370,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         val mediaPlayer = MediaPlayer()
 
-        /**
-         * Event handlers
-         */
-        btnGroupSystem.isChecked = true
-        //Event handler for elavator response
-        btnTestVoice.setOnClickListener{ responseAtElevator() }
-        btnSpeak.setOnClickListener { speak() }
-        btnSaveLocation.setOnClickListener { saveLocation() }
-        btnGoTo.setOnClickListener { goTo() }
-
         btnStopMovement.setOnClickListener { stopMovement() }
         btnFollow.setOnClickListener { followMe() }
-        btnskidJoy.setOnClickListener { skidJoy() }
+//        btnskidJoy.setOnClickListener { skidJoy() }
         btnskidJoyDialog.setOnClickListener {
             val alert = AlertDialog.Builder(it.context)
                 .setTitle("Skid Joy control by WSAD")
@@ -439,9 +427,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
             }
         }
-        btnTiltAngle.setOnClickListener { tiltAngle() }
-        btnTiltBy.setOnClickListener { tiltBy() }
-        btnTurnBy.setOnClickListener { turnBy() }
+//        btnTiltAngle.setOnClickListener { tiltAngle() }
+//        btnTiltBy.setOnClickListener { tiltBy() }
+//        btnTurnBy.setOnClickListener { turnBy() }
         btnBatteryInfo.setOnClickListener { getBatteryData() }
         btnSavedLocations.setOnClickListener { savedLocationsDialog() }
         btnCallOwner.setOnClickListener { callOwner() }
@@ -513,17 +501,14 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         btnGetVolume.setOnClickListener { getVolume() }
         btnSetVolume.setOnClickListener { setVolume() }
         btnRequestToBeKioskApp.setOnClickListener { requestToBeKioskApp() }
-        btnStartDetectionModeWithDistance.setOnClickListener { startDetectionWithDistance() }
-        btnFetchSequence.setOnClickListener { getAllSequences() }
+//        btnFetchSequence.setOnClickListener { getAllSequences() }
         btnFetchTour.setOnClickListener { getAllTours() }
         btnPlayFirstSequence.setOnClickListener { playFirstSequence() }
         btnPlayFirstTour.setOnClickListener { playFirstTour() }
         btnPlayFirstSequenceWithoutPlayer.setOnClickListener { playFirstSequenceWithoutPlayer() }
         btnFetchMap.setOnClickListener { getMap() }
         btnClearLog.setOnClickListener { clearLog() }
-        btnNlu.setOnClickListener { startNlu() }
         btnGetAllContacts.setOnClickListener { getAllContacts() }
-        btnGoToPosition.setOnClickListener { goToPosition() }
         btnStartTelepresenceToCenter.setOnClickListener { startTelepresenceToCenter() }
         btnStartMeeting.setOnClickListener { startMeeting() }
         btnCreateLinkBasedMeeting.setOnClickListener {
@@ -692,20 +677,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the onClickListeners for the Elevator tab buttons are
          */
-
-        btnTest1.setOnClickListener{doTest1()}
-        btnListMaps.setOnClickListener{getMapListBtn()}
         btnLoadMapNoDialog.setOnClickListener{
             loadMapNoDialog(reposeRequired = false, position = Position(4.5F, 0.083F, -1.6F, 23), offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
         btnLoadMapNoDialog2.setOnClickListener{
             loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
         }
-        btnChangeSpeed.setOnClickListener { setSpeed() }
-        listenerButton.setOnClickListener { ListenerButton() } //listener button
+
         btnImageProcessing.setOnClickListener { startImageProcessing() }
         btnPrintBarcodes.setOnClickListener { printBarcodes() }
-        listenerButton.setOnClickListener { ListenerButton() } //listener button
         ExitElevator.setOnClickListener { ExitElevator() } //new method
         GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
         GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
@@ -777,7 +757,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 }
             }
         }
-
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
@@ -786,7 +765,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
         }
     }
-
     private fun isPermissionGranted(context: Context, permission: String): Boolean {
         if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         ) {
@@ -907,6 +885,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
             ACTION_HOME_EXITELEVATOR -> ExitElevator()
 
+            ACTION_HOME_INTRO -> Intro();
+
             ACTION_HOME_DANCE -> {
                 val t = System.currentTimeMillis()
                 val end = t + 5000
@@ -918,22 +898,16 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    private fun doTest1(){
+    /**
+     * Method to test on the new button
+     */
+    private fun Intro() {
+        robot.speak(create("---Hi everyone my name is TEMI. I am a personal robot that uses state" +
+                "of the art AI, sensors and cameras to navigate your home or office, control smart, devices and " +
+                "facilitate moving video calls. ", false))
+        //Get an answer from the user - listen to response
 
-        /**
-         * This is how you run code on the UI Thread
-         */
-        runOnUiThread {
-            printLog("Hello world!")
-        }
-
-        /**
-         * This is where the actual logic should be written
-         */
     }
-
-
-
 
     /**
      * Method to test on the new button
@@ -948,7 +922,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * What to speak inside the elevator
      */
     private fun responseInElevator() {
-        robot.speak(create("---Waiting to exit the elevator Master!", false))
+        robot.speak(create("---Waiting to exit the elevator", false))
         //Get an answer from the user - listen to response
 
     }
@@ -957,16 +931,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * What to speak outside the elevator ( essentially the arrive method )
      */
     private fun responseUponExit(destination : String) {
-        robot.speak(create("---Arrived at cyber security room",false))
+        robot.speak(create("---Arrived at EA wing",false))
         //Get an answer from the user - listen to response
 
-    }
-
-    /**
-     * Test functionality of going to an elevator, then into, then out of, then home
-     */
-    private fun ListenerButton() {
-        //Todo
     }
 
     private fun GoToElevator() {
@@ -1049,7 +1016,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             printLog(e.message ?: "")
         }
     }
-
     private fun ExitElevator() {
         val destination: String = "final_destination"
 
@@ -1059,6 +1025,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             ) {
                 // Now on right floor
                 printLog("On right floor!")
+                robot.speak(create("---Correct Floor Detected",false))
+
                 arraylist.clear() // clear list of detected barcodes
 
                 // go to
@@ -1069,7 +1037,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     noBypass = false,
                     speedLevel = SpeedLevel.HIGH
                 )
-
                 // Register the OnGoToLocationStatusChangedListener
                 val goToLocationListener = object : OnGoToLocationStatusChangedListener {
                     override fun onGoToLocationStatusChanged(
@@ -1087,14 +1054,17 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                         }
                     }
                 }
-
                 robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
                 barcodeScannerProcessor?.detectedBarcode = ""
             }
             else if (barcodeScannerProcessor?.detectedBarcode?.equals("") == true){
                 printLog("No Barcode Detected!")
             }
-            else printLog("Wrong Barcode Detected!")
+            else {
+                printLog("Wrong Barcode Detected!")
+                robot.speak(create("---Incorrect Floor Detected, try again",false))
+
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             printLog(e.message ?: "")
@@ -1172,8 +1142,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             runOnUiThread {
                 printLog("Loading map: ${mapList[pos]}, request id $requestId, reposeRequired $reposeRequired, position $position, offline $offline, withoutUI $withoutUI")
             }
-
-
         }
     }
 
@@ -1218,11 +1186,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun getCurrentFloor() {
         printLog(robot.getCurrentFloor()?.toString() ?: "Get current floor failed")
     }
-
     private fun loadFloorAtElevator() {
         if (floorList.isEmpty()) {
             getAllFloors()
@@ -1254,9 +1220,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private var floorList = emptyList<Floor>()
-
     private fun getAllFloors() {
         if (requestPermissionIfNeeded(Permission.MAP, REQUEST_CODE_GET_ALL_FLOORS)) {
             return
@@ -1267,29 +1231,23 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             printLog(it.toString())
         }
     }
-
     private fun isBackTOFEnabled() {
         printLog("Back TOF enabled: ${robot.backTOFEnabled}")
     }
-
     private fun toggleBackTOF() {
         robot.backTOFEnabled = !robot.backTOFEnabled
         isBackTOFEnabled()
     }
-
     private fun isFrontTOFEnabled() {
         printLog("Front TOF enabled: ${robot.frontTOFEnabled}")
     }
-
     private fun toggleFrontTOF() {
         robot.frontTOFEnabled = !robot.frontTOFEnabled
         isFrontTOFEnabled()
     }
-
     private fun getHeadDepthSensitivity() {
         printLog("Head depth sensitivity: ${robot.headDepthSensitivity}")
     }
-
     private fun setHeadDepthSensitivity() {
         val adapter = ArrayAdapter(
             this,
@@ -1309,11 +1267,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun getCliffSensorMode() {
         printLog("Cliff sensor mode: ${robot.cliffSensorMode.name}")
     }
-
     private fun setCliffSensorMode() {
         if (!robot.hasCliffSensor()) {
             printLog("No cliff sensor, invalid operation.")
@@ -1341,20 +1297,16 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun hasCliffSensor() {
         printLog("Has cliff sensor: ${robot.hasCliffSensor()}")
     }
-
     private fun isGroundDepthCliffEnabled() {
         printLog("Ground depth cliff enabled: ${robot.groundDepthCliffDetectionEnabled}")
     }
-
     private fun toggleGroundDepthCliff() {
         robot.groundDepthCliffDetectionEnabled = !robot.groundDepthCliffDetectionEnabled
         isGroundDepthCliffEnabled()
     }
-
     private fun getSupportedLatinKeyboards() {
         val supportedLatinKeyboards = robot.getSupportedLatinKeyboards()
         var count = 0
@@ -1363,7 +1315,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 printLog("No.${++count} Latin keyboard: ${it.key}, enabled: ${it.value}")
             }
     }
-
     private fun enabledLatinKeyboards() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1373,19 +1324,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          */
         robot.enabledLatinKeyboards(robot.getSupportedLatinKeyboards().keys.toList().subList(0, 5))
     }
-
     private fun isKioskModeOn() {
         printLog("Is kiosk mode on: ${robot.isKioskModeOn()}")
     }
-
     private fun toggleKiosk() {
         robot.setKioskModeOn(!robot.isKioskModeOn())
     }
-
     private fun getMode() {
         printLog("System mode: ${robot.getMode()}")
     }
-
     private fun setMode() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1407,11 +1354,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun getNickName() {
         printLog("temi's nick name: ${robot.getNickName()}")
     }
-
     private fun toggleHardBtnVolume() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1424,7 +1369,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         )
         printLog("Set hard button volume: ${robot.getHardButtonMode(HardButton.VOLUME)}")
     }
-
     private fun toggleHardBtnPower() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1437,7 +1381,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         )
         printLog("Set hard button power: ${robot.getHardButtonMode(HardButton.POWER)}")
     }
-
     private fun setHardBtnMainMode() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1459,7 +1402,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun setSoundMode() {
         if (requestPermissionIfNeeded(Permission.SETTINGS, REQUEST_CODE_NORMAL)) {
             return
@@ -1480,7 +1422,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         dialog.show()
     }
-
     private fun hideKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         var view = currentFocus
@@ -1489,7 +1430,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
-
     /**
      * Places this application in the top bar for a quick access shortcut.
      */
@@ -1505,12 +1445,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
         }
     }
-
     /**
      * Have the robot speak while displaying what is being said.
      */
     private fun speak() {
-        val text = etSpeak.text.toString()
         val languages = ArrayList<TtsRequest.Language>()
         TtsRequest.Language.values().forEach {
             language ->  languages.add(language)
@@ -1523,8 +1461,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         dialog.listView.onItemClickListener =
             OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
                 val ttsRequest =
-                    create(text, language = adapter.getItem(position)!!, showAnimationOnly = true)
-                robot.speak(ttsRequest)
                 printLog("Speak: ${adapter.getItem(position)}")
                 dialog.dismiss()
             }
@@ -1532,44 +1468,29 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         hideKeyboard()
     }
 
-    /**
-     * This is an example of saving locations.
-     */
-    private fun saveLocation() {
-        val location =
-            etSaveLocation.text.toString().lowercase().trim { it <= ' ' }
-        val result = robot.saveLocation(location)
-        if (result) {
-            robot.speak(create("I've successfully saved the $location location.", true))
-        } else {
-            robot.speak(create("Saved the $location location failed.", true))
-        }
-        hideKeyboard()
-    }
 
-    /**
-     * goTo checks that the location sent is saved then goes to that location.
-     */
-    private fun goTo() {
-        for (location in robot.locations) {
-
-
-            if (location == etGoTo.text.toString().lowercase()
-                    .trim { it <= ' ' }
-            ) {
-                robot.goTo(
-                    etGoTo.text.toString().lowercase().trim { it <= ' ' },
-                    backwards = false,
-                    noBypass = false,
-//                    modified line below from permanently being set to HIGH
-                    speedLevel = robot.goToSpeed
-                )
-                hideKeyboard()
-            }
-        }
-    }
-
-
+//
+//    /**
+//     * goTo checks that the location sent is saved then goes to that location.
+//     */
+//    private fun goTo() {
+//        for (location in robot.locations) {
+//
+//
+//            if (location == etGoTo.text.toString().lowercase()
+//                    .trim { it <= ' ' }
+//            ) {
+//                robot.goTo(
+//                    etGoTo.text.toString().lowercase().trim { it <= ' ' },
+//                    backwards = false,
+//                    noBypass = false,
+////                    modified line below from permanently being set to HIGH
+//                    speedLevel = robot.goToSpeed
+//                )
+//                hideKeyboard()
+//            }
+//        }
+//    }
 
     /**
      * stopMovement() is used whenever you want the robot to stop any movement
@@ -1593,62 +1514,62 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * skidJoy moves the robot exactly forward for about a second. It controls both
      * the linear and angular velocity. Float numbers must be between -1.0 and 1.0
      */
-    private fun skidJoy() {
-        val t = System.currentTimeMillis()
-        val end = t + 500
-        val speedX = try {
-            etX.text.toString().toFloat()
-        } catch (e: Exception) {
-            1f
-        }
-        val speedY = try {
-            etY.text.toString().toFloat()
-        } catch (e: Exception) {
-            0f
-        }
-        printLog("speedX: $speedX, speedY: $speedY")
-        while (System.currentTimeMillis() < end) {
-            robot.skidJoy(speedX, speedY)
-        }
-    }
+//    private fun skidJoy() {
+//        val t = System.currentTimeMillis()
+//        val end = t + 500
+//        val speedX = try {
+//            etX.text.toString().toFloat()
+//        } catch (e: Exception) {
+//            1f
+//        }
+//        val speedY = try {
+//            etY.text.toString().toFloat()
+//        } catch (e: Exception) {
+//            0f
+//        }
+//        printLog("speedX: $speedX, speedY: $speedY")
+//        while (System.currentTimeMillis() < end) {
+//            robot.skidJoy(speedX, speedY)
+//        }
+//    }
 
     /**
      * tiltAngle controls temi's head by specifying which angle you want
      * to tilt to and at which speed.
      */
-    private fun tiltAngle() {
-        val speed = try {
-            etDistance.text.toString().toFloat()
-        } catch (e: Exception) {
-            1f
-        }
-        robot.tiltAngle(23, speed)
-    }
+//    private fun tiltAngle() {
+//        val speed = try {
+//            etDistance.text.toString().toFloat()
+//        } catch (e: Exception) {
+//            1f
+//        }
+//        robot.tiltAngle(23, speed)
+//    }
 
-    /**
-     * turnBy allows for turning the robot around in place. You can specify
-     * the amount of degrees to turn by and at which speed.
-     */
-    private fun turnBy() {
-        val speed = try {
-            etDistance.text.toString().toFloat()
-        } catch (e: Exception) {
-            1f
-        }
-        robot.turnBy(90, speed)
-    }
+//    /**
+//     * turnBy allows for turning the robot around in place. You can specify
+//     * the amount of degrees to turn by and at which speed.
+//     */
+//    private fun turnBy() {
+//        val speed = try {
+//            etDistance.text.toString().toFloat()
+//        } catch (e: Exception) {
+//            1f
+//        }
+//        robot.turnBy(90, speed)
+//    }
 
-    /**
-     * tiltBy is used to tilt temi's head from its current position.
-     */
-    private fun tiltBy() {
-        val speed = try {
-            etDistance.text.toString().toFloat()
-        } catch (e: Exception) {
-            1f
-        }
-        robot.tiltBy(70, speed)
-    }
+//    /**
+//     * tiltBy is used to tilt temi's head from its current position.
+//     */
+//    private fun tiltBy() {
+//        val speed = try {
+//            etDistance.text.toString().toFloat()
+//        } catch (e: Exception) {
+//            1f
+//        }
+//        robot.tiltBy(70, speed)
+//    }
 
     /**
      * getBatteryData can be used to return the current battery status.
@@ -1856,7 +1777,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     override fun onDetectionStateChanged(state: Int) {
-        tvDetectionState.text =
+//        tvDetectionState.text =
             "Detect State -> ${OnDetectionStateChangedListener.DetectionStatus.fromValue(state)}"
     }
 
@@ -1977,7 +1898,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             }
             Permission.SEQUENCE -> when (requestCode) {
                 REQUEST_CODE_SEQUENCE_FETCH_ALL -> {
-                    getAllSequences()
+//                    getAllSequences()
                 }
                 REQUEST_CODE_SEQUENCE_PLAY -> {
                     playFirstSequence(true)
@@ -2197,12 +2118,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         ) {
             return
         }
-        var distanceStr = etDistance.text.toString()
-        if (distanceStr.isEmpty()) distanceStr = "0"
+//        var distanceStr = etDistance.text.toString()
+//        if (distanceStr.isEmpty()) distanceStr = "0"
         try {
-            val distance = distanceStr.toFloat()
-            robot.setDetectionModeOn(true, distance)
-            printLog("Start detection mode with distance: $distance")
+//            val distance = distanceStr.toFloat()
+//            robot.setDetectionModeOn(true, distance)
+//            printLog("Start detection mode with distance: $distance")
         } catch (e: Exception) {
             printLog("startDetectionModeWithDistance", e.message ?: "")
         }
@@ -2214,12 +2135,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             text +=
                 " -> $location :: ${distances[location]}\n"
         }
-        tvDistance.text = text
+//        tvDistance.text = text
     }
 
     @SuppressLint("SetTextI18n")
     override fun onCurrentPositionChanged(position: Position) {
-        tvPosition.text =
+//        tvPosition.text =
             "Position -> {${position.x}, ${position.y}, ${position.yaw}}, tilt: ${position.tiltAngle}"
     }
 
@@ -2251,11 +2172,11 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     override fun onDetectionDataChanged(detectionData: DetectionData) {
-        tvDetection.text = if (detectionData.isDetected) {
-            "Detect -> angle ${detectionData.angle}, dist ${detectionData.distance}"
-        } else {
-            "No detection"
-        }
+//        tvDetection.text = if (detectionData.isDetected) {
+//            "Detect -> angle ${detectionData.angle}, dist ${detectionData.distance}"
+//        } else {
+//            "No detection"
+//        }
     }
 
     override fun onUserInteraction(isInteracting: Boolean) {
@@ -2265,33 +2186,33 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     @Volatile
     private var allSequences: List<SequenceModel> = emptyList()
 
-    private fun getAllSequences() {
-        if (requestPermissionIfNeeded(Permission.SEQUENCE, REQUEST_CODE_SEQUENCE_FETCH_ALL)) {
-            return
-        }
-        Thread {
-            allSequences = robot.getAllSequences(etNlu.text?.split(",") ?: emptyList())
-            printLog("allSequences: ${allSequences.size}", false)
-            val imageKeys: MutableList<String> = ArrayList()
-            for ((_, _, _, imageKey) in allSequences) {
-                if (imageKey.isEmpty()) continue
-                imageKeys.add(imageKey)
-            }
-            val pairs = if (imageKeys.isEmpty()) {
-                emptyList()
-            } else {
-                robot.getSignedUrlByMediaKey(imageKeys)
-            }
-            runOnUiThread {
-                for (sequenceModel in allSequences) {
-                    printLog(sequenceModel.toString())
-                }
-                for (pair in pairs) {
-                    printLog(pair.component2(), false)
-                }
-            }
-        }.start()
-    }
+//    private fun getAllSequences() {
+//        if (requestPermissionIfNeeded(Permission.SEQUENCE, REQUEST_CODE_SEQUENCE_FETCH_ALL)) {
+//            return
+//        }
+//        Thread {
+//            allSequences = robot.getAllSequences(etNlu.text?.split(",") ?: emptyList())
+//            printLog("allSequences: ${allSequences.size}", false)
+//            val imageKeys: MutableList<String> = ArrayList()
+//            for ((_, _, _, imageKey) in allSequences) {
+//                if (imageKey.isEmpty()) continue
+//                imageKeys.add(imageKey)
+//            }
+//            val pairs = if (imageKeys.isEmpty()) {
+//                emptyList()
+//            } else {
+//                robot.getSignedUrlByMediaKey(imageKeys)
+//            }
+//            runOnUiThread {
+//                for (sequenceModel in allSequences) {
+//                    printLog(sequenceModel.toString())
+//                }
+//                for (pair in pairs) {
+//                    printLog(pair.component2(), false)
+//                }
+//            }
+//        }.start()
+//    }
 
     private fun playFirstSequence() {
         if (requestPermissionIfNeeded(Permission.SEQUENCE, REQUEST_CODE_SEQUENCE_PLAY)) {
@@ -2483,7 +2404,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun startNlu() {
-        robot.startDefaultNlu(etNlu.text.toString())
+//        robot.startDefaultNlu(etNlu.text.toString())
     }
 
     override fun onSdkError(sdkException: SdkException) {
@@ -2501,17 +2422,17 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         }
     }
 
-    private fun goToPosition() {
-        try {
-            val x = etX.text.toString().toFloat()
-            val y = etY.text.toString().toFloat()
-            val yaw = etYaw.text.toString().toFloat()
-            robot.goToPosition(Position(x, y, yaw, 0), backwards = false, noBypass = false)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            printLog(e.message ?: "")
-        }
-    }
+//    private fun goToPosition() {
+//        try {
+//            val x = etX.text.toString().toFloat()
+//            val y = etY.text.toString().toFloat()
+//            val yaw = etYaw.text.toString().toFloat()
+//            robot.goToPosition(Position(x, y, yaw, 0), backwards = false, noBypass = false)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            printLog(e.message ?: "")
+//        }
+//    }
 
     override fun onConversationStatusChanged(status: Int, text: String) {
         printLog("Conversation", "status=$status, text=$text")
@@ -2715,30 +2636,30 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     private fun loadMapWithPosition() {
-        loadMapWithPosition(false)
+//        loadMapWithPosition(false)
     }
 
     private fun loadMapWithReposePosition() {
-        loadMapWithPosition(true)
+//        loadMapWithPosition(true)
     }
 
     private fun loadMapWithRepose() {
         loadMap(true, null)
     }
 
-    private fun loadMapWithPosition(reposeRequired: Boolean) {
-        try {
-            val x = etX.text.toString().toFloat()
-            val y = etY.text.toString().toFloat()
-            val yaw = etYaw.text.toString().toFloat()
-            loadMap(true, Position(x, y, yaw, 0))
-            val position = Position(x, y, yaw, 0)
-            loadMap(reposeRequired, position)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            printLog(e.message ?: "")
-        }
-    }
+//    private fun loadMapWithPosition(reposeRequired: Boolean) {
+//        try {
+//            val x = etX.text.toString().toFloat()
+//            val y = etY.text.toString().toFloat()
+////            val yaw = etYaw.text.toString().toFloat()
+////            loadMap(true, Position(x, y, yaw, 0))
+//            val position = Position(x, y, yaw, 0)
+//            loadMap(reposeRequired, position)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            printLog(e.message ?: "")
+//        }
+//    }
 
     private fun getTts() {
         printLog("Get TTS Voice result ${robot.getTtsVoice()}")
@@ -2770,7 +2691,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         const val HOME_BASE_LOCATION = "home base"
         const val ACTION_HOME_GOTOELEVATOR = "home.gotoelevator"
         const val ACTION_HOME_GOINSIDEELEVATOR = "home.goinsideelevator"
-        const val ACTION_HOME_EXITELEVATOR= "home.exitelevator"
+        const val ACTION_HOME_EXITELEVATOR = "home.exitelevator"
+        const val ACTION_HOME_INTRO = "home.intro"
 
         // Storage Permissions
         private const val REQUEST_EXTERNAL_STORAGE = 1
@@ -2960,7 +2882,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     @SuppressLint("SetTextI18n")
     override fun onGreetModeStateChanged(state: Int) {
-        tvGreetMode.text = "Greet Mode -> ${OnGreetModeStateChangedListener.State.fromValue(state)}"
+//        tvGreetMode.text = "Greet Mode -> ${OnGreetModeStateChangedListener.State.fromValue(state)}"
     }
 
     override fun onLoadFloorStatusChanged(status: Int) {
