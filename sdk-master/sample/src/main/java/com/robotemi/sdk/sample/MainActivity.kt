@@ -110,6 +110,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     TextToSpeech.OnInitListener, OnLoadFloorStatusChangedListener,
     OnDistanceToDestinationChangedListener, OnSdkExceptionListener, OnRobotDragStateChangedListener {
 
+    private var EA3_wing_floorId = "1638818F1620F03A726457879BD152BF"
+
     private lateinit var robot: Robot
 
     private val executorService = Executors.newSingleThreadExecutor()
@@ -351,8 +353,12 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
         val mediaPlayer = MediaPlayer()
 
+        /**
+         * Event handlers
+         */
         btnGroupSystem.isChecked = true
-
+        //Event handler for elavator response
+        btnTestVoice.setOnClickListener{ responseAtElevator() }
         btnSpeak.setOnClickListener { speak() }
         btnSaveLocation.setOnClickListener { saveLocation() }
         btnGoTo.setOnClickListener { goTo() }
@@ -668,6 +674,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
          * This is where the onClickListeners for the Elevator tab buttons are
          */
 
+        listenerButton.setOnClickListener { ListenerButton() } //listener button
+        ExitElevator.setOnClickListener { ExitElevator() } //new method
+        GoInsideElevatorButton.setOnClickListener { GoInsideElevator() } //new method
+        GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
         btnTest1.setOnClickListener{doTest1()}
         btnListMaps.setOnClickListener{getMapListBtn()}
         btnLoadMapNoDialog.setOnClickListener{
@@ -685,6 +695,24 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                                             //    offline: Boolean = false,
                                             //    withoutUI: Boolean = false,
                                             //    id: String = ""
+
+    /**
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     * OUR CODE FOR TEMI
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+
     /**
      * This is where the onClick functions for the Elevator tab buttons are
      */
@@ -701,6 +729,234 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the actual logic should be written
          */
+    }
+
+
+
+    /**
+     * Method to test on the new button
+     */
+    private fun responseAtElevator() {
+        robot.speak(create("---Please push the elevator button for me!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * What to speak inside the elevator
+     */
+    private fun responseInElevator() {
+        robot.speak(create("---Waiting to exit the elevator Master!", false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * What to speak outside the elevator ( essentially the arrive method )
+     */
+    private fun responseUponExit(destination : String) {
+        robot.speak(create("---Arrived at cyber security room",false))
+        //Get an answer from the user - listen to response
+
+    }
+
+    /**
+     * Go to a specified location
+     * @param destination The location to go to
+     */
+    private fun goToLocation(destination: String) {
+        //error message
+
+    }
+
+
+    private fun ListenerButton() {
+        //Todo
+    }
+
+
+
+
+
+
+    private fun GoToElevator() {
+        val destination: String = "Infrontelevator"
+
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location Gabe")
+                            // Voice Response
+                            responseAtElevator()
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
+
+
+
+
+
+    private fun GoInsideElevator() {
+        val destination: String = "inside_elevator"
+
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response - callback function
+                            responseInElevator()
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
+
+    private fun ExitElevator() {
+        val destination: String = "arrivedDestination"
+
+        try {
+            // Start the robot movement
+            robot.goTo(
+                destination.lowercase().trim(),
+                backwards = false,
+                noBypass = false,
+                speedLevel = SpeedLevel.HIGH
+            )
+
+            // Register the OnGoToLocationStatusChangedListener
+            val goToLocationListener = object : OnGoToLocationStatusChangedListener {
+                override fun onGoToLocationStatusChanged(
+                    location: String,
+                    @OnGoToLocationStatusChangedListener.GoToLocationStatus status: String,
+                    descriptionId: Int,
+                    description: String
+                ) {
+                    if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
+                        runOnUiThread {
+                            printLog("\nSuccessfully arrived at $location")
+                            // Voice Response - callback function
+                            responseUponExit(location)
+                        }
+                    }
+                }
+            }
+
+            robot.addOnGoToLocationStatusChangedListener(goToLocationListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            printLog(e.message ?: "")
+        }
+    }
+
+    /**
+     * Test functionality of going to an elevator, then into, then out of, then home
+     */
+    private fun WillsGoTo() {
+        var myLocations = arrayOf("ea3outpasselev", "ea3inpasselev", "ea3outpasselev", "home base")
+        var myLocation = myLocations[sequenceNum]
+        //error message
+        runOnUiThread {
+            printLog("\nTrying to go to location: $myLocation")
+        }
+
+        for (location in robot.locations) {
+
+            if(myLocation == "ea3outpasselev") {
+                runOnUiThread {
+                    printLog("\n\n working \n\n")
+                    robot.speak(create("---Going to elevator" , false, cached = true))
+                }
+            }
+
+            if(myLocation == "ea3inpasselev") {
+                runOnUiThread {
+                    printLog("\n\n working \n\n")
+                    robot.speak(create("---Please open the elevator" , false, cached = true))
+                }
+            }
+
+            if (location.lowercase() == myLocation.lowercase()
+                    .trim { it <= ' ' }
+            ) {
+
+                robot.goTo(
+                    myLocation.lowercase().trim { it <= ' ' },
+                    backwards = false,
+                    noBypass = false,
+                    speedLevel = SpeedLevel.HIGH
+                )
+
+
+            } else {
+                runOnUiThread {
+                    printLog("\nLocation not found $myLocation")
+                }
+            }
+        }
+        if (myLocation == "home base") {
+            runOnUiThread {
+                printLog("\nYou are home.  I'm going back to the main screen")
+            }
+        }
+
+        else if (myLocation == "ea3inpasselev") {
+            runOnUiThread {
+                robot.speak(create("---Please push the elevator button for me!", false))
+            }
+        }
+        else {
+            var nextLoc = myLocations[sequenceNum + 1]
+            runOnUiThread {
+                printLog("\nPress button again to go to next location: $nextLoc")
+            }
+        }
+        sequenceNum++
     }
 
     /**
@@ -1657,6 +1913,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             asrResult.equals("Hello", ignoreCase = true) -> {
                 robot.askQuestion("Hello, I'm temi, what can I do for you?")
             }
+            asrResult.equals("Go to elevator", ignoreCase = true) -> {
+                GoToElevator()
+            }
+
             asrResult.equals("Play music", ignoreCase = true) -> {
                 robot.finishConversation()
                 robot.speak(create("Okay, please enjoy.", false))

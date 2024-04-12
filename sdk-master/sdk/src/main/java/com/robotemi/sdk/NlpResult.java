@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 public final class NlpResult implements Parcelable {
 
     public static final Parcelable.Creator<NlpResult> CREATOR = new Parcelable.Creator<NlpResult>() {
-
         @Override
         public NlpResult createFromParcel(Parcel in) {
             return new NlpResult(in);

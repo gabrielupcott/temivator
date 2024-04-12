@@ -5,12 +5,16 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
 
+
+
+
+
 /**
  * @param id will remain the same when you create a TtsRequest and when you received it from [onTtsStatusChanged] callback
  */
 data class TtsRequest(
     val id: UUID = UUID.randomUUID(),
-    val speech: String,
+    var speech: String,
     var packageName: String = "",
     var status: Status = Status.PENDING,
     val drawableBitmap: Bitmap? = null,

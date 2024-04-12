@@ -13,6 +13,11 @@
         android:text="Test 1" />
 
     <Button
+        android:id="@+id/btnTestVoice"
+        style="@style/ButtonCommon"
+        android:text="Elevator Voice Response" />
+
+    <Button
         android:id="@+id/btnListMaps"
         style="@style/ButtonCommon"
         android:text="List Maps" />
@@ -49,6 +54,34 @@
         android:layout_width="325dp"
         android:layout_height="wrap_content"
         android:text="Will's Test Button" />
+
+    <Button
+        android:id="@+id/GoToElevatorButton"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Go To Elevator" />
+
+    <Button
+        android:id="@+id/GoInsideElevatorButton"
+        style="@style/ButtonCommon"
+        android:layout_height="wrap_content"
+        android:layout_width="325dp"
+        android:text="Go inside elevator" />
+
+    <Button
+        android:id="@+id/ExitElevator"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Exit Elevator" />
+
+    <Button
+        android:id="@+id/listenerButton"
+        style="@style/ButtonCommon"
+        android:layout_width="325dp"
+        android:layout_height="wrap_content"
+        android:text="Listener Button" />
 
 
 </LinearLayout>
