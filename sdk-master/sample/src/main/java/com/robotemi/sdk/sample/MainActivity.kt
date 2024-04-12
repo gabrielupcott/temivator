@@ -103,7 +103,6 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.common.InputImage.fromBitmap
 import com.google.mlkit.vision.barcode.ZoomSuggestionOptions.ZoomCallback
 import com.google.mlkit.vision.barcode.common.Barcode
-//import com.google.mlkit.vision.common.InputImage
 import java.io.InputStream
 import com.robotemi.sdk.sample.barcodescanner.BarcodeScannerProcessor
 
@@ -677,13 +676,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         /**
          * This is where the onClickListeners for the Elevator tab buttons are
          */
-        btnLoadMapNoDialog.setOnClickListener{
-            loadMapNoDialog(reposeRequired = false, position = Position(4.5F, 0.083F, -1.6F, 23), offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
-        }
-        btnLoadMapNoDialog2.setOnClickListener{
-            loadMapNoDialog(reposeRequired = true, position = null, offline = true, withoutUI = true, id = "65bbaf6bfdf79826183d4b9f" )
-        }
-
         btnImageProcessing.setOnClickListener { startImageProcessing() }
         btnPrintBarcodes.setOnClickListener { printBarcodes() }
         ExitElevator.setOnClickListener { ExitElevator() } //new method
@@ -691,11 +683,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         GoToElevatorButton.setOnClickListener { GoToElevator() } //new method
     }
 
-                                            //    reposeRequired: Boolean,
-                                            //    position: Position?,
-                                            //    offline: Boolean = false,
-                                            //    withoutUI: Boolean = false,
-                                            //    id: String = ""
 
     /**
      *
@@ -724,6 +711,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * This is where the onClick functions for the Elevator tab buttons are
      */
 
+
+    /**
+     * Private singletons for camera and barcode scanning
+     */
     private var cameraSource: CameraSource? = null
     private var preview: CameraSourcePreview? = null
     private var graphicOverlay: GraphicOverlay? = null
@@ -732,11 +723,18 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private var arraylist = ArrayList<String>()
     private var zoomCallback: ZoomSuggestionOptions.ZoomCallback? = null
     private var barcodeScannerProcessor: BarcodeScannerProcessor? = null
+    private var processor: BarcodeScannerProcessor? = null
 
+    /**
+     * Function to print currently detected barcode to UI
+     */
     private fun printBarcodes(){
         barcodeScannerProcessor?.let { printLog("barcode: " +it.detectedBarcode) }
     }
 
+    /**
+     * Function to ensure runtime camera permissions are granted
+     */
     private fun allRuntimePermissionsGranted(): Boolean {
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
             permission?.let {
@@ -748,6 +746,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         return true
     }
 
+    /**
+     * Function to request camera permissions
+     */
     private fun getRuntimePermissions() {
         val permissionsToRequest = ArrayList<String>()
         for (permission in REQUIRED_RUNTIME_PERMISSIONS) {
@@ -765,6 +766,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
         }
     }
+
+    /**
+     * Function to ensure camera permissions are granted
+     */
     private fun isPermissionGranted(context: Context, permission: String): Boolean {
         if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
         ) {
@@ -775,23 +780,36 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
         return false
     }
 
+    /**
+     * Function that runs when Image Processing button is pressed. Checks for permissions and then
+     * initializes the camera source and starts it.
+     *
+     * NOTE: Much of this camera functionality comes from the Google MLKit documentation and example code. Here
+     * is the link: https://developers.google.com/ml-kit. This is why so many additional classes such as "CameraSource"
+     * and the "barcodescanner" folder are included in the project.
+     */
     private fun startImageProcessing(){
+        // Ensure permissions
         if (!allRuntimePermissionsGranted()) {
             getRuntimePermissions()
         }
         else {
+            // Initialize preview views
             preview = findViewById(R.id.preview_view2)
             graphicOverlay = findViewById(R.id.graphic_overlay3)
+
+            // Create camera source
             createCameraSource(selectedModel)
             if (cameraSource != null){
-//                createCameraSource(selectedModel)
+                // Start camera source
                 startCameraSource()
             }
         }
     }
-    //private val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-    private var processor: BarcodeScannerProcessor? = null
 
+    /**
+     * Function to create camera source with barcode scanner
+     */
     private fun createCameraSource(model: String): BarcodeScannerProcessor? {
         // If there's no existing cameraSource, create one.
         if (cameraSource == null) {
@@ -799,22 +817,8 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             barcodeScannerProcessor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode)
         }
         try {
-//            when (model) {
-//                "Object Detection" -> {
-//                    //Log.i(TAG, "Using Object Detector Processor")
-//                    val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-//                    processor = ObjectDetectorProcessor(this, objectDetectorOptions)
-////                    cameraSource!!.setMachineLearningFrameProcessor(
-////                        ObjectDetectorProcessor(this, objectDetectorOptions)
-////                    )
-//                    cameraSource!!.setMachineLearningFrameProcessor(
-//                        processor
-//                    )
-//                    return processor as ObjectDetectorProcessor
-//
-//                }
-//                //else -> //Log.e(TAG, "Unknown model: $model")
-//            }
+            // Wrapped in when block so that additional scanners could be added later. Currently
+            // the model can only be Barcode Scanner
             when (model) {
                 "Barcode Scanner" -> {
                     Log.i(TAG, "Using Barcode Detector Processor")
@@ -822,6 +826,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     if (PreferenceUtils.shouldEnableAutoZoom(this)) {
                         zoomCallback = ZoomCallback { zoomLevel: Float -> cameraSource!!.setZoom(zoomLevel) }
                     }
+                    // This has been modified to also include a detectedBarcode parameter in order to
+                    // retrieve the detected barcode back here in the MainActivity. See BarcodeScannerProcessor
+                    // for more details.
                     processor = BarcodeScannerProcessor(this, zoomCallback, detectedBarcode = detectedBarcode)
                     cameraSource!!.setMachineLearningFrameProcessor(
                         barcodeScannerProcessor
@@ -837,9 +844,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
                 .show()
         }
-        Log.e(TAG, "hello")
-        val objectDetectorOptions = PreferenceUtils.getObjectDetectorOptionsForLivePreview(this)
-//        return ObjectDetectorProcessor(this, objectDetectorOptions)
         if (PreferenceUtils.shouldEnableAutoZoom(this)) {
             zoomCallback = ZoomCallback { zoomLevel: Float -> cameraSource!!.setZoom(zoomLevel) }
         }
@@ -902,6 +906,11 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
      * Method to test on the new button
      */
     private fun Intro() {
+        // Note that each robot.speak call includes "---" before all messages. This is to ensure the temi
+        // only says the messages we tell it to. Without this modification, it often interrupts itself
+        // with navigation and object avoidance messages.
+        //
+        // CTRL + Click the speak() method to see more details
         robot.speak(create("---Hi everyone my name is TEMI. I am a personal robot that uses state" +
                 "of the art AI, sensors and cameras to navigate your home or office, control smart, devices and " +
                 "facilitate moving video calls. ", false))
@@ -1027,7 +1036,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                 printLog("On right floor!")
                 robot.speak(create("---Correct Floor Detected",false))
 
-                arraylist.clear() // clear list of detected barcodes
+                detectedBarcode = "" // clear last detected barcode
 
                 // go to
                 // Start the robot movement
@@ -1231,6 +1240,10 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             printLog(it.toString())
         }
     }
+
+    /**
+     * END OF OUR CODE
+     */
     private fun isBackTOFEnabled() {
         printLog("Back TOF enabled: ${robot.backTOFEnabled}")
     }
@@ -2646,20 +2659,6 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     private fun loadMapWithRepose() {
         loadMap(true, null)
     }
-
-//    private fun loadMapWithPosition(reposeRequired: Boolean) {
-//        try {
-//            val x = etX.text.toString().toFloat()
-//            val y = etY.text.toString().toFloat()
-////            val yaw = etYaw.text.toString().toFloat()
-////            loadMap(true, Position(x, y, yaw, 0))
-//            val position = Position(x, y, yaw, 0)
-//            loadMap(reposeRequired, position)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            printLog(e.message ?: "")
-//        }
-//    }
 
     private fun getTts() {
         printLog("Get TTS Voice result ${robot.getTtsVoice()}")

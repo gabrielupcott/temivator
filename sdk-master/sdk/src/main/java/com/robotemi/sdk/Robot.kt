@@ -810,6 +810,11 @@ class Robot private constructor(private val context: Context) {
      */
     fun speak(ttsRequest: TtsRequest) {
         try {
+            // Modified to only run if the string "---" is at the start of the message.
+            //
+            // This is to ensure the temi only says the messages we tell it to. Without
+            // this modification, it often interrupts itself
+            // with navigation and object avoidance messages.
             if (ttsRequest.speech.startsWith("---")){
                 var speech = ttsRequest.speech.subSequence(startIndex = 2, ttsRequest.speech.length)
                 ttsRequest.speech = speech.toString()

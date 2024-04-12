@@ -29,7 +29,13 @@ import com.google.mlkit.vision.common.InputImage
 import com.robotemi.sdk.sample.GraphicOverlay
 import com.robotemi.sdk.sample.VisionProcessorBase
 
-/** Barcode Detector Demo. */
+/** Barcode Detector Demo.
+ *
+ *  NOTE FROM GABE:
+ *  I had to modify these classes to include a detectedBarcode string parameter
+ *  in order to send the detected barcode here to the MainActivity.
+ *
+ * */
 class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, detectedBarcode: String) :
   VisionProcessorBase<List<Barcode>>(context) {
 
@@ -59,10 +65,6 @@ class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, det
     barcodeScanner.close()
   }
 
-//  fun getDetectedBarcode(): String {
-//    return detectedBarcode
-//  }
-
   override fun detectInImage(image: InputImage): Task<List<Barcode>> {
     return barcodeScanner.process(image)
   }
@@ -75,8 +77,9 @@ class BarcodeScannerProcessor(context: Context, zoomCallback: ZoomCallback?, det
       val barcode = barcodes[i]
       graphicOverlay.add(BarcodeGraphic(graphicOverlay, barcode))
       logExtrasForTesting(barcode)
+
+      // Store detected barcode value into string.
       detectedBarcode = barcode.displayValue.toString()
-//      if (!arraylist.contains(barcode.displayValue)) barcode.displayValue?.let { arraylist.add(it) }
     }
   }
 

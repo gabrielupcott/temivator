@@ -12,22 +12,6 @@
     tools:ignore="HardcodedText">
 
     <Button
-        android:id="@+id/btnLoadMapNoDialog"
-        style="@style/ButtonCommon"
-        android:layout_width="313dp"
-        android:layout_height="88dp"
-        android:background="#5F72DC"
-        android:text="Load map by id, no repose" />
-
-    <Button
-        android:id="@+id/btnLoadMapNoDialog2"
-        style="@style/ButtonCommon"
-        android:layout_width="312dp"
-        android:layout_height="91dp"
-        android:background="#5F72DC"
-        android:text="Load map by id, with repose" />
-
-    <Button
         android:id="@+id/btnImageProcessing"
         style="@style/ButtonCommon"
         android:layout_width="313dp"
