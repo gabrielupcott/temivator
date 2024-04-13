@@ -919,7 +919,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     /**
-     * Method to test on the new button
+     * This is a simple method to generate a robot.speak response
      */
     private fun responseAtElevator() {
         robot.speak(create("---Please push the elevator button for me!", false))
@@ -928,7 +928,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     /**
-     * What to speak inside the elevator
+     * This is a simple method to generate a robot.speak response
      */
     private fun responseInElevator() {
         robot.speak(create("---Waiting to exit the elevator", false))
@@ -937,7 +937,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
     }
 
     /**
-     * What to speak outside the elevator ( essentially the arrive method )
+     *This is a simple method to generate a robot.speak response
      */
     private fun responseUponExit(destination : String) {
         robot.speak(create("---Arrived at EA wing",false))
@@ -945,12 +945,15 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
     }
 
+    /**
+    * This method will get the robot to go the elevator. *** The destination string must match the location name in the map editor ***
+    */
     private fun GoToElevator() {
         if (cameraSource == null){
             startImageProcessing()
         }
         val destination: String = "outside_elevator"
-
+        //Attempts to get the robot to go to location
         try {
             // Start the robot movement
             robot.goTo(
@@ -961,6 +964,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
             )
 
             // Register the OnGoToLocationStatusChangedListener
+            //This is required to detect the location changed. 
             val goToLocationListener = object : OnGoToLocationStatusChangedListener {
                 override fun onGoToLocationStatusChanged(
                     location: String,
@@ -968,6 +972,9 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
                     descriptionId: Int,
                     description: String
                 ) {
+                    //This is a listener for if the robot has arrived at its location. If it arrives at the location we may want it to do something at the elevator.
+                    //This functionality or the response can be programmed into the response at elevator method. This seperates the logic. 
+                    //We require this code below to react when it has arrived at a location. Then responseAtElevator does our functionality upon arriving at elevator
                     if (status == OnGoToLocationStatusChangedListener.COMPLETE) {
                         runOnUiThread {
                             printLog("\nSuccessfully arrived at destination")
@@ -988,7 +995,7 @@ class MainActivity : AppCompatActivity(), NlpListener, OnRobotReadyListener,
 
 
 
-
+    //Similar functionality to the above method see above method documentation for precise documents
     private fun GoInsideElevator() {
         val destination: String = "elevator"
 
