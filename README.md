@@ -1,4 +1,4 @@
 # temivator
 
-LINK TO DOCS:
-https://docs.google.com/document/d/1kXbm-hP0Ej47r9cxUhKYwHb9lL-1WJ9w7NYhvU4wyyw/edit?usp=sharing
+LINK TO FINAL REPORT:
+https://drive.google.com/file/d/17XjdkL7jDHM4TgjZ7-qDxCfV8ffoTHcU/view?usp=sharing
